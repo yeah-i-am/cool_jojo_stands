@@ -1,0 +1,49 @@
+/*
+Keys: ItemName, ItemTooltip, BuffName, BuffDescription, ProjectileName, NPCName, MapObject, Prefix;
+*/
+
+/*********
+ * Buffs *
+ *********/
+
+BuffName.StarPlatinumStand = You are the owner of Star Platinum
+BuffDescription.StarPlatinumStand = This is melee stand, very fast
+
+/*********
+ * Armor *
+ *********/
+
+  /* Jorato */
+
+ItemName.JotaroCap = Jotaro cap
+ItemTooltip.JotaroCap = Looks cool
+
+ItemName.JotaroCoat = Jotaro coat
+ItemTooltip.JotaroCoat = Looks like school uniform
+
+ItemName.JotaroLeggins = Jotaro pants
+ItemTooltip.JotaroLeggins = Cost twenty yen
+
+  /* Avdol */
+
+ItemName.AvdolCap = Avdol head
+ItemTooltip.AvdolCap = Looks like cactus
+
+ItemName.AvdolCoat = Avdol coat
+ItemTooltip.AvdolCoat = Oh, are you from Egypt?
+
+ItemName.AvdolLegs = Avdol pants
+ItemTooltip.AvdolLegs = So comfortable that they can revive a dead
+
+/*********
+ * Items *
+ *********/
+
+ItemName.stand_arrow = Stand arrow
+ItemTooltip.stand_arrow = For outdoor use
+
+/***************
+ * Projectiles *
+ ***************/
+
+ProjectileName.StarPlatinum = Star Platinum
