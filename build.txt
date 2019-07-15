@@ -1,5 +1,5 @@
 author = G@yLord239 and Jen`Ok
-version = 0.1.0
+version = 0.1.0.1
 displayName = [c/AF00AF:JoJo Stands] (by G@yLord239)
 hideCode = true
 hideResources = true
