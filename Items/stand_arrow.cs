@@ -10,7 +10,7 @@ namespace cool_jojo_stands.Items
 	{
         string[] stands =
         {
-          "StarPlatinumStand", "MagicianRedStand"
+          "StarPlatinumStand", "MagicianRedStand", "HierophantGreenStand"///, "HermitPurpleStand"
         };
 
         public override void SetStaticDefaults()
@@ -53,12 +53,22 @@ namespace cool_jojo_stands.Items
             {
                 case "Avdol":
                 case "avdol":
-                    player.AddBuff(mod.BuffType<Buffs.MagicianRedStand>(), 101);
+                    player.AddBuff(mod.BuffType<Buffs.MagicianRedStand>(), 239);
                     return base.UseItem(player);
 
                 case "Jotaro":
                 case "jotaro":
-                    player.AddBuff(mod.BuffType<Buffs.StarPlatinumStand>(), 101);
+                    player.AddBuff(mod.BuffType<Buffs.StarPlatinumStand>(), 239);
+                    return base.UseItem(player);
+
+                case "Joseph":
+                case "joseph":
+                    player.AddBuff(mod.BuffType<Buffs.HermitPurpleStand>(), 239);
+                    return base.UseItem(player);
+
+                case "Kakyoin":
+                case "kakyoin":
+                    player.AddBuff(mod.BuffType<Buffs.HierophantGreenStand>(), 239);
                     return base.UseItem(player);
             }
 

@@ -10,7 +10,7 @@ namespace cool_jojo_stands.Items.Armor
 		public override void SetStaticDefaults()
 		{
             DisplayName.SetDefault("Jotaro pants");
-			Tooltip.SetDefault("Cost twenty yen");
+			Tooltip.SetDefault("Cost twenty thousand yen");
 		}
 
 		public override void SetDefaults()

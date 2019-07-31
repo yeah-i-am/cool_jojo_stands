@@ -1,5 +1,5 @@
 author = G@yLord239 and Jen`Ok
-version = 0.1.0.1
+version = 0.2.0.0
 displayName = [c/AF00AF:JoJo Stands] (by G@yLord239)
 hideCode = true
 hideResources = true
@@ -7,4 +7,4 @@ includeSource = false
 
 homepage = https://vk.com/jojostandmod
 
-buildIgnore = *.csproj, *.user, obj\*, bin\*, .vs\*
+buildIgnore = *.csproj, *.user, obj\*, bin\*, .vs\*, Effects\Compile\*

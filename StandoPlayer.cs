@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
 namespace cool_jojo_stands
 {
+    /*******************
+     * Data structures *
+     *******************/
     public class DefeatedBosses
     {
         public bool Boss1 = false;
@@ -29,7 +33,28 @@ namespace cool_jojo_stands
 
         public bool MoonLord = false;
 
-        public void Save( ref TagCompound tag )
+        public void Initialize()
+        {
+            Boss1 = false;
+            Boss2 = false;
+            Boss3 = false;
+            SlimeKing = false;
+            QueenBee = false;
+
+            WallOfFresh = false;
+
+            MechBoss1 = false;
+            MechBoss2 = false;
+            MechBoss3 = false;
+
+            PlantBoss = false;
+            GolemBoss = false;
+            Fishron = false;
+
+            MoonLord = false;
+        }
+
+        public void Save( TagCompound tag )
         {
             tag.Add("DefBoss1", Boss1);
             tag.Add("DefBoss2", Boss2);
@@ -46,7 +71,7 @@ namespace cool_jojo_stands
             tag.Add("DefMoonlord", MoonLord);
         }
 
-        public void Load(ref TagCompound tag)
+        public void Load( TagCompound tag )
         {
           Boss1 =     tag.GetBool("DefBoss1");
           Boss2 =     tag.GetBool("DefBoss2");
@@ -172,24 +197,37 @@ namespace cool_jojo_stands
         }
     };
 
+    /**************
+     * Mod Player *
+     **************/
     public class StandoPlayer : ModPlayer
     {
+        /* Have stand flags */
         public bool HaveStand = false;
-
         public bool HaveStarPlatinum = false;
         public bool HaveMagicianRedStand = false;
+        public bool HaveHarmitPurpleStand = false;
+        public bool HaveHierophantGreenStand = false;
+
+        /* Time stop variable */
+        public bool InvincibilityInStopTime = false;
 
         public bool StandSpawned = false;
         public bool StandJustSpawned = false;
 
+        /* Stands users sets variables */
         public bool HaveStandUpSet = false;
         public int StandJotaroSetBonus = 0;
         public int StandAvdolSetBonus = 0;
+        public int StandJosephSetBonus = 0;
+        public int StandKakyoinSetBonus = 0;
 
+        /* Stand level variables */
         public int StandLevel = 1;
         public int StandXP = 0;
         public int StandNeedToUpXP = 3;
 
+        /* Boss checklist */
         public BossChecker KilledBosses = new BossChecker();
 
         public override void SetupStartInventory(IList<Item> items)
@@ -200,6 +238,7 @@ namespace cool_jojo_stands
             items.Add(item);
         }
 
+        /* Send message to chat */
         public static void Talk(string message)
         {
             if (Main.netMode != 2)
@@ -210,36 +249,38 @@ namespace cool_jojo_stands
 
         public override void ResetEffects()
         {
+            /* Save stand after dead */
             if (HaveStarPlatinum)
                 player.AddBuff(mod.BuffType<Buffs.StarPlatinumStand>(), 300);
             else if (HaveMagicianRedStand)
                 player.AddBuff(mod.BuffType<Buffs.MagicianRedStand>(), 300);
+            else if (HaveHarmitPurpleStand)
+                player.AddBuff(mod.BuffType<Buffs.HermitPurpleStand>(), 300);
+            else if (HaveHierophantGreenStand)
+                player.AddBuff(mod.BuffType<Buffs.HierophantGreenStand>(), 300);
         }
 
-        void CheckNewLevelXP()
-        {
-            StandNeedToUpXP = (int)(Math.Pow(StandLevel, 1.3) * 3);
-        }
-
+        /* Level up processing */
         bool CheckLevelUp()
         {
+            StandXP += KilledBosses.CheckKilled();
+
             if (StandXP >= StandNeedToUpXP)
             {
                 StandXP -= StandNeedToUpXP;
                 StandLevel++;
-                CheckNewLevelXP();
+                StandNeedToUpXP = (int)(Math.Pow(StandLevel, 1.3) * 3); // New xp to level up
                 return true;
             }
 
             return false;
         }
 
+        /* Pre update... */
         public override void PreUpdate()
         {
             if (!HaveStandUpSet)
-                StandJotaroSetBonus = StandAvdolSetBonus = 0;
-
-            StandXP += KilledBosses.CheckKilled();
+                StandJotaroSetBonus = StandAvdolSetBonus = StandJosephSetBonus = StandKakyoinSetBonus = 0;
 
             if (CheckLevelUp())
                 Talk("Congratulations! Your stand level increased: " + StandLevel.ToString());
@@ -253,6 +294,23 @@ namespace cool_jojo_stands
             base.PostUpdate();
         }
 
+        public override bool PreHurt(bool pvp, bool quiet, ref int damage, ref int hitDirection, ref bool crit, ref bool customDamage, ref bool playSound, ref bool genGore, ref PlayerDeathReason damageSource)
+        {
+            if (InvincibilityInStopTime)
+                return false;
+
+            return base.PreHurt(pvp, quiet, ref damage, ref hitDirection, ref crit, ref customDamage, ref playSound, ref genGore, ref damageSource);
+        }
+
+        /* Initializing player data
+         * needs to right loading */
+        public override void Initialize()
+        {
+            KilledBosses.Def.Initialize();
+            base.Initialize();
+        }
+
+        /* Save and load player data */
         public override TagCompound Save()
         {
             TagCompound Data = new TagCompound();
@@ -260,7 +318,7 @@ namespace cool_jojo_stands
             Data.Add("StandXP", StandXP);
             Data.Add("StandLVL", StandLevel);
             Data.Add("StandLVLUP", StandNeedToUpXP);
-            KilledBosses.Def.Save(ref Data);
+            KilledBosses.Def.Save(Data);
 
             return Data;
         }
@@ -272,7 +330,7 @@ namespace cool_jojo_stands
                 StandXP = tag.GetInt("StandXP");
                 StandLevel = tag.GetInt("StandLVL");
                 StandNeedToUpXP = tag.GetInt("StandLVLUP");
-                KilledBosses.Def.Load(ref tag);
+                KilledBosses.Def.Load(tag);
             }
 
             base.Load(tag);

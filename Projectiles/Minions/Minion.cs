@@ -14,5 +14,7 @@ namespace cool_jojo_stands.Projectiles.Minions
         public abstract void CheckActive();
 
         public abstract void Behavior();
+
+        public abstract void Some();
     }
 }

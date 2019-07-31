@@ -33,11 +33,11 @@ namespace cool_jojo_stands.Items
 
         public override void AddRecipes()
         {
-            ModRecipe recipe = new ModRecipe(mod);
-            recipe.AddIngredient(ItemID.StoneBlock, 10);
-            recipe.AddTile(TileID.WorkBenches);
-            recipe.SetResult(this);
-            recipe.AddRecipe();
+            ///ModRecipe recipe = new ModRecipe(mod);
+            ///recipe.AddIngredient(ItemID.StoneBlock, 10);
+            ///recipe.AddTile(TileID.WorkBenches);
+            ///recipe.SetResult(this);
+            ///recipe.AddRecipe();
         }
 
         public override bool UseItem(Player player)

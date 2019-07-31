@@ -6,17 +6,15 @@ using Terraria.ModLoader;
 
 namespace cool_jojo_stands.Buffs
 {
-    public class MagicianRedStand : ModBuff
+    public class HierophantGreenStand : ModBuff
     {
         public override void SetDefaults()
         {
-            DisplayName.SetDefault("You are the owner of Magician Red");
-            Description.SetDefault("This is fire stand, very hot");
+            DisplayName.SetDefault("You are the owner of Hierophant Green");
+            Description.SetDefault("nO oNe CaN jUsT dEfLeCt ThE eMeRaLd SpLaSh");
             Main.buffNoSave[Type] = false; // false
             canBeCleared = false;
             Main.buffNoTimeDisplay[Type] = true;
-            ///Main.pvpBuff[Type] = true;
-            //Main.persistentBuff[Type] = true;
             Main.debuff[Type] = true;
         }
 
@@ -24,9 +22,9 @@ namespace cool_jojo_stands.Buffs
         {
             StandoPlayer StandPlayer = player.GetModPlayer<StandoPlayer>(mod);
 
-            if (!StandPlayer.HaveMagicianRedStand)
+            if (!StandPlayer.HaveHierophantGreenStand)
             {
-                StandPlayer.HaveMagicianRedStand = true;
+                StandPlayer.HaveHierophantGreenStand = true;
                 StandPlayer.HaveStand = true;
             }
 
@@ -38,8 +36,10 @@ namespace cool_jojo_stands.Buffs
                 StandPlayer.StandJustSpawned = true;
                 ///Main.PlaySound(mod.GetLegacySoundSlot(SoundType.Custom, "Sounds/Custom/Star_Platinum"));
 
-                Projectile.NewProjectile(player.position.X + (float)(player.width / 2), player.position.Y + (float)(player.height / 2) + 15,
-                    0f, 0f, mod.ProjectileType<Projectiles.Minions.MagicianRed>(), 1 * StandPlayer.StandLevel, 2.0f, player.whoAmI, 0f, 0f);
+                int proj = Projectile.NewProjectile(player.position.X + (float)(player.width / 2), player.position.Y + (float)(player.height / 2),
+                    0, 0, mod.ProjectileType<Projectiles.Minions.HierophantGreen>(),
+                    1 * StandPlayer.StandLevel, 2.0f, player.whoAmI, 0f, 0f);
+
             }
         }
     }

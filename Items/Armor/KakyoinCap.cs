@@ -6,13 +6,13 @@ using Terraria.ModLoader;
 namespace cool_jojo_stands.Items.Armor
 {
     [AutoloadEquip(EquipType.Head)]
-    public class JotaroCap : ModItem
+    public class KakyoinCap : ModItem
     {
         bool Set = false;
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Jotaro Cap");
-            Tooltip.SetDefault("Looks cool");
+            DisplayName.SetDefault("Kakyoin Hair");
+            Tooltip.SetDefault("Ebaniy hvost");
         }
 
         public override void SetDefaults()
@@ -26,29 +26,23 @@ namespace cool_jojo_stands.Items.Armor
 
         public override bool IsArmorSet(Item head, Item body, Item legs)
         {
-            return (Set = (body.type == mod.ItemType<JotaroCoat>() && legs.type == mod.ItemType<JotaroLeggins>()));
+            return (Set = (body.type == mod.ItemType<KakyoinCoat>() && legs.type == mod.ItemType<KakyoinLeggins>()));
         }
 
         public override void UpdateArmorSet(Player player)
         {
-            player.setBonus = "Star Platinum became faster";
+            player.setBonus = "nothing";
             StandoPlayer pl = player.GetModPlayer<StandoPlayer>(mod);
             pl.HaveStandUpSet = true;
-            pl.StandJotaroSetBonus = 1;
-        }
-
-        public override void DrawArmorColor(Player drawPlayer, float shadow, ref Color color, ref int glowMask, ref Color glowMaskColor)
-        {
-            drawPlayer.yoraiz0rDarkness = true;
-            base.DrawArmorColor(drawPlayer, shadow, ref color, ref glowMask, ref glowMaskColor);
+            pl.StandKakyoinSetBonus = 1;
         }
 
         public override void AddRecipes()
         {
             ModRecipe recipe = new ModRecipe(mod);
             recipe.AddIngredient(ItemID.Silk, 20);
-            recipe.AddIngredient(ItemID.GoldBar, 10);
-            recipe.AddIngredient(ItemID.Obsidian, 12);
+            recipe.AddIngredient(ItemID.PinkGel, 4);
+            recipe.AddIngredient(ItemID.Ruby, 1);
             recipe.AddTile(TileID.Anvils);
             recipe.SetResult(this);
             recipe.AddRecipe();

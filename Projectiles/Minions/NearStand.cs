@@ -67,7 +67,7 @@ namespace cool_jojo_stands.Projectiles.Minions
                         trgdir = npc.Center - projectile.Center;
                         trgdir.Y = 0f;
                         trgdir.X = Math.Sign(trgdir.X);
-                        targetPos = npc.Center - trgdir * (npc.width + projectile.width) * 0.45f;
+                        targetPos = npc.Center - trgdir * (npc.Hitbox.Width + projectile.width) * 0.37f;
                         AUA = true;
                     }
                 }
@@ -104,7 +104,7 @@ namespace cool_jojo_stands.Projectiles.Minions
             {
                 if (TargetDist > maxPlayerDist)
                 {
-                    NewVelocity = Direction * player.velocity.Length();
+                    NewVelocity = Direction * Math.Max(player.velocity.Length(), 5f);
                 }
                 else
                 {
@@ -113,7 +113,7 @@ namespace cool_jojo_stands.Projectiles.Minions
                 }
             }
             else
-                projectile.velocity /= 1.2f;
+                NewVelocity /= 1.2f;
 
             if (projectile.velocity.Length() > maxSpeed)
             {
@@ -126,7 +126,12 @@ namespace cool_jojo_stands.Projectiles.Minions
             projectile.velocity = NewVelocity;
             SelectFrame();
             CreateDust();
+            Some();
             projectile.netUpdate = true;
+        }
+
+        public override void Some()
+        {
         }
 
         public override void CheckActive()

@@ -79,7 +79,7 @@ namespace cool_jojo_stands.Projectiles.Minions
 
             Lighting.AddLight(projectile.position + projectile.Size / 2, 0.7f, 0f, 0f);
 
-            int i, j;
+            int i;
 
               for (i = 0; i < 4; i++)
               {
@@ -149,5 +149,8 @@ namespace cool_jojo_stands.Projectiles.Minions
 
             base.ModifyHitNPC(target, ref damage, ref knockback, ref crit, ref hitDirection);
         }
+
+        public override void Some()
+        { }
     }
 }

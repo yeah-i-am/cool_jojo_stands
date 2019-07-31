@@ -13,9 +13,6 @@ namespace cool_jojo_stands.Items.Armor
     [AutoloadEquip(EquipType.Body)]
     class JotaroCoat : ModItem
     {
-        bool HaveJotaroBoots = false;
-        int a = 0;
-
         public override void SetStaticDefaults()
         {
             base.SetStaticDefaults();
@@ -34,23 +31,7 @@ namespace cool_jojo_stands.Items.Armor
 
         public override void DrawArmorColor(Player drawPlayer, float shadow, ref Color color, ref int glowMask, ref Color glowMaskColor)
         {
-            ///if (drawPlayer.armor[2].type == mod.ItemType<JotaroLeggins>())
-            ///    HaveJotaroBoots = true;
-            ///else
-            ///    HaveJotaroBoots = false;
-
             base.DrawArmorColor(drawPlayer, shadow, ref color, ref glowMask, ref glowMaskColor);
-        }
-
-        public override void SetMatch(bool male, ref int equipSlot, ref bool robes)
-        {
-            ///robes = true;
-
-            // The equipSlot is added in cool_jojo_stands.cs --> Load hook
-            ///if (HaveJotaroBoots)
-            ///    equipSlot = mod.GetEquipSlot("JotaroCoat_LegsAndBoots", EquipType.Legs);
-            ///else
-            ///    equipSlot = mod.GetEquipSlot("JotaroCoat_Legs", EquipType.Legs);
         }
 
         public override void DrawHands(ref bool drawHands, ref bool drawArms)
@@ -67,7 +48,6 @@ namespace cool_jojo_stands.Items.Armor
             recipe.AddIngredient(ItemID.Obsidian, 15);
             recipe.AddIngredient(ItemID.FallenStar, 1);
             recipe.AddTile(TileID.Anvils);
-            ///recipe.AddTile(TileID.WorkBenches);
             recipe.SetResult(this);
             recipe.AddRecipe();
         }
