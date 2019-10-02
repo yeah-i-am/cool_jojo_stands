@@ -8,6 +8,9 @@ namespace cool_jojo_stands.Projectiles
 {
     public class FireBlast : ModProjectile
     {
+        /*****************
+         * Some settings *
+         *****************/
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Fire Blast");
@@ -26,11 +29,16 @@ namespace cool_jojo_stands.Projectiles
             projectile.ignoreWater = false;
         }
 
+        public override bool? CanCutTiles() => true;
+        public override bool? CanHitNPC(NPC target) => !target.friendly;
+        public override bool CanHitPlayer(Player target) => false;
+
+        /* Fire blast AI function */
         public override void AI()
         {
             if (projectile.localAI[0] == 0f)
             {
-                PlaySound();
+                Main.PlaySound(SoundID.Item20, projectile.position);
                 projectile.localAI[0] = 1f;
             }
 
@@ -41,14 +49,9 @@ namespace cool_jojo_stands.Projectiles
             }
             else
                 projectile.ai[0] = 0;
-
         }
 
-        public void PlaySound()
-        {
-            Main.PlaySound(SoundID.Item20, projectile.position);
-        }
-
+        /* Fire blast dust function */
         public void CreateDust()
         {
             int i, j;
@@ -74,27 +77,7 @@ namespace cool_jojo_stands.Projectiles
                 }
         }
 
-        /*public override bool CanDamage()
-        {
-            return true;
-        }*/
-
-        public override bool? CanCutTiles()
-        {
-            return true;
-        }
-
-        public override bool? CanHitNPC(NPC target)
-        {
-            return !target.friendly;
-        }
-
-        public override bool CanHitPlayer(Player target)
-        {
-            return false;
-            ///return base.CanHitPlayer(target);
-        }
-
+        /* NPC hit function */
         public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
             projectile.penetrate--;
@@ -108,10 +91,5 @@ namespace cool_jojo_stands.Projectiles
 
             base.ModifyHitNPC(target, ref damage, ref knockback, ref crit, ref hitDirection);
         }
-
-        public override void ModifyHitPlayer(Player target, ref int damage, ref bool crit)
-        {
-            base.ModifyHitPlayer(target, ref damage, ref crit);
-        }
-    }
+    } /* End of 'FireBlast' function */
 }

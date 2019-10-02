@@ -2,16 +2,27 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
+using Terraria.Graphics.Effects;
+using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.Graphics.Shaders;
 
 namespace cool_jojo_stands.Projectiles.Minions
 {
     public class StarPlatinum : NearStand
     {
+        /* Time stop variables */
         bool TimeStop = false;
+        private static NPC[] NPCis = new NPC[200];
+        private static bool[] NPCActive = new bool[200];
+        private static bool[] ProjActive  = new bool[1000];
+        private static int[] ProjTimeLeft  = new int[1000];
+        private static float[,] ProjAi  = new float[1000, 2];
+        private static float[,] ProjLocalAi  = new float[1000, 2];
 
+        /*****************
+         * Some settings *
+         *****************/
         public override void SetStaticDefaults()
         {
             Main.projFrames[projectile.type] = 15;
@@ -26,21 +37,26 @@ namespace cool_jojo_stands.Projectiles.Minions
             projectile.height = 92;
             projectile.friendly = true;
             projectile.penetrate = -1;
-            projectile.timeLeft = 18000;
+            projectile.timeLeft = 239;
             projectile.tileCollide = false;
             projectile.melee = true;
             projectile.ignoreWater = true;
             projectile.alpha = 30;
         }
 
+        public override bool CanDamage() => false;
+        public override bool? CanCutTiles() => false;
+        public override bool? CanHitNPC(NPC target) => !target.friendly && attacking;
+        public override bool MinionContactDamage() => false;
+
+        /* Select animation frame function */
         public override void SelectFrame()
         {
-            Player player = Main.player[projectile.owner];
-            StandoPlayer pl = player.GetModPlayer<StandoPlayer>(mod);
+            StandoPlayer pl = Main.player[projectile.owner].GetModPlayer<StandoPlayer>(mod);
 
             projectile.frameCounter++;
 
-            if (atacking)
+            if (attacking)
             {
                 if (pl.StandJotaroSetBonus > 0)
                 {
@@ -65,50 +81,24 @@ namespace cool_jojo_stands.Projectiles.Minions
               }
         }
 
+        /* Star Platinum dust function */
         public override void CreateDust()
         {
-            Lighting.AddLight(projectile.position + projectile.Size / 2, 0.7f, 0f, 0.7f);
+            Lighting.AddLight(projectile.Center, 0.7f, 0f, 0.7f);
         }
 
-        public override bool CanDamage()
+        /***********************
+         * Time stop functions *
+         ***********************/
+        public static void Unload()
         {
-            return true;
+            NPCis = null;
+            ProjActive = null;
+            ProjTimeLeft = null;
+            ProjAi = null;
+            ProjLocalAi = null;
+            NPCActive = null;
         }
-
-        public override bool? CanCutTiles()
-        {
-            return false;
-        }
-
-        public override bool? CanHitNPC(NPC target)
-        {
-            return !target.friendly && atacking;
-        }
-
-        public override bool MinionContactDamage()
-        {
-            return true;
-        }
-
-        public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
-        {
-            Player player = Main.player[projectile.owner];
-            StandoPlayer pl = player.GetModPlayer<StandoPlayer>(mod);
-
-            damage *= (pl.StandLevel * pl.StandLevel) + pl.StandLevel;
-
-            if (pl.StandJotaroSetBonus > 0)
-              target.StrikeNPC(damage, 0f, hitDirection);
-
-            base.ModifyHitNPC(target, ref damage, ref knockback, ref crit, ref hitDirection);
-        }
-
-        private static NPC[] NPCis = new NPC[200];
-        private static bool[] ProjActive  = new bool[1000];
-        private static int[] ProjTimeLeft  = new int[1000];
-        private static float[,] ProjAi  = new float[1000, 2];
-        private static float[,] ProjLocalAi  = new float[1000, 2];
-        private static bool[] NPCActive = new bool[200];
 
         private void ZaWardo()
         {
@@ -174,7 +164,7 @@ namespace cool_jojo_stands.Projectiles.Minions
 
         public override bool PreAI()
         {
-            if (cool_jojo_stands.SpecialAbilityHT.JustPressed && false /* in progress */)
+            if (cool_jojo_stands.SpecialAbilityHT.JustPressed && false/* in progress */)
             {
                 TimeStop = !TimeStop;
 
@@ -184,20 +174,50 @@ namespace cool_jojo_stands.Projectiles.Minions
 
                 StandoPlayer.Talk("TimeStop: " + (TimeStop ? "On" : "Off"));
 
-                for (int k = 0; k < 200; k++)
+                if (TimeStop)
                 {
-                    NPCis[k] = Main.npc[k].Clone() as NPC;
-                    NPCActive[k] = Main.npc[k].active;
-                }
+                    for (int k = 0; k < 200; k++)
+                    {
+                        NPCis[k] = Main.npc[k].Clone() as NPC;
+                        NPCActive[k] = Main.npc[k].active;
+                    }
 
-                for (int k = 0; k < 1000; k++)
-                    ProjTimeLeft[k] = Main.projectile[k].timeLeft;
+                    for (int k = 0; k < 1000; k++)
+                        ProjTimeLeft[k] = Main.projectile[k].timeLeft;
+
+                    if (!Filters.Scene["ZaWardo"].IsActive())
+                    {
+                        Filters.Scene.Activate("ZaWardo", pl.player.Center).GetShader().UseTargetPosition(pl.player.Center)
+                            .UseOpacity(1f)                 // Speed
+                            .UseColor(6, 1, 0.0f)           // Stop time, back to normal time, End of 1/2 za wardo skip time
+                            .UseSecondaryColor(1, 0, 239);  // End of 1/2 za wardo, negative offset
+                    }
+
+                    projectile.ai[0] = 0f;
+                }
             }
             if (TimeStop)
             {
                 for (int k = 0; k < 200; k++)
                     Main.npc[k].frameCounter--;
+
+                /* Za Wardo shader */
+                float progress = projectile.ai[0];
+                Filters.Scene["ZaWardo"].GetShader().UseProgress(progress);
+
+                Matrix projection = Matrix.CreateOrthographicOffCenter(0,
+                    Main.graphics.GraphicsDevice.Viewport.Width,
+                    Main.graphics.GraphicsDevice.Viewport.Height,
+                    0, 0, 1);
+                Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
+                Filters.Scene["ZaWardo"].GetShader().Shader.Parameters["MatrixTransform"].SetValue(halfPixelOffset * projection);
             }
+            else
+            {
+                //if ()
+            }
+
+            projectile.ai[0] += 1 / 60f;
 
             return base.PreAI();
         }
@@ -219,17 +239,13 @@ namespace cool_jojo_stands.Projectiles.Minions
             base.PostAI();
         }
 
-        ///public override bool PreDraw(SpriteBatch spriteBatch, Color lightColor)
-        ///{
-        ///    Main.spriteBatch.End();
-        ///    Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.GameViewMatrix.ZoomMatrix);
-        ///
-        ///    var ZWShader = GameShaders.Misc["cool_jojo_stands:ZaWardo"];
-        ///
-        ///    ZWShader.UseOpacity(1f);
-        ///
-        ///    ZWShader.Apply(null);
-        ///    return true;
-        ///}
-    }
+        /* Stand kill function */
+        public override void Kill(int timeLeft)
+        {
+            Player player = Main.player[projectile.owner];
+            StandoPlayer pl = player.GetModPlayer<StandoPlayer>(mod);
+            Filters.Scene["ZaWardo"].Deactivate();
+            pl.StandSpawned = false;
+        }
+    } /* End of 'StarPlatinum' class */
 }

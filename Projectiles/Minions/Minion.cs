@@ -7,8 +7,15 @@ namespace cool_jojo_stands.Projectiles.Minions
     {
         public override void AI()
         {
-            CheckActive();
-            Behavior();
+            try
+            {
+                CheckActive();
+                Behavior();
+            }
+            catch
+            {
+
+            }
         }
 
         public abstract void CheckActive();

@@ -26,23 +26,10 @@ namespace cool_jojo_stands.Buffs
             {
                 StandPlayer.HaveHarmitPurpleStand = true;
                 StandPlayer.HaveStand = true;
+                StandPlayer.StandBuffName = "HermitPurple";
             }
 
-            player.buffTime[buffIndex] = 300;
-
-            if (!StandPlayer.StandSpawned && cool_jojo_stands.StandSummonHT.JustPressed)
-            {
-                StandPlayer.StandSpawned = true;
-                StandPlayer.StandJustSpawned = true;
-                ///Main.PlaySound(mod.GetLegacySoundSlot(SoundType.Custom, "Sounds/Custom/Star_Platinum"));
-
-                int proj = Projectile.NewProjectile(player.position.X + (float)(player.width / 2), player.position.Y + (float)(player.height / 2),
-                    0,
-                    0,
-                    mod.ProjectileType<Projectiles.HermitPurple>(), 1 * StandPlayer.StandLevel, 2.0f, player.whoAmI, 0f, 0f);
-
-                Main.projectile[proj].modProjectile.UseGrapple(player, ref Main.projectile[proj].type);
-            }
+            player.buffTime[buffIndex] = 2390;
         }
     }
 }

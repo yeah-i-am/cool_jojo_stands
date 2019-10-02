@@ -35,51 +35,41 @@ namespace cool_jojo_stands.Items
 			item.autoReuse = false;
 	}
 
-		/*public override void AddRecipes()
-		{
-			ModRecipe recipe = new ModRecipe(mod);
-			recipe.AddIngredient(ItemID.LunarBar, 47);
-			recipe.AddTile(TileID.MythrilAnvil);
-			recipe.SetResult(this);
-			recipe.AddRecipe();
-		}*/
-
         public override bool UseItem( Player player )
         {
             if (player.GetModPlayer<StandoPlayer>(mod).HaveStand)
-              return base.UseItem(player);
+              return true;
 
             switch(player.name)
             {
                 case "Avdol":
                 case "avdol":
                     player.AddBuff(mod.BuffType<Buffs.MagicianRedStand>(), 239);
-                    return base.UseItem(player);
+                    return true;
 
                 case "Jotaro":
                 case "jotaro":
                     player.AddBuff(mod.BuffType<Buffs.StarPlatinumStand>(), 239);
-                    return base.UseItem(player);
+                    return true;
 
                 case "Joseph":
                 case "joseph":
                     player.AddBuff(mod.BuffType<Buffs.HermitPurpleStand>(), 239);
-                    return base.UseItem(player);
+                    return true;
 
                 case "Kakyoin":
                 case "kakyoin":
                     player.AddBuff(mod.BuffType<Buffs.HierophantGreenStand>(), 239);
-                    return base.UseItem(player);
+                    return true;
             }
 
             Random rand = new Random(DateTime.Now.Second);
 
-            ///StandoPlayer.Talk(DateTime.Now.Second.ToString());
-
             player.Hurt(Terraria.DataStructures.PlayerDeathReason.ByCustomReason(player.name + " died because was stupid"), 99, 1);
 
-            player.AddBuff(mod.BuffType(stands[rand.Next(stands.Length)]), 101);
-            return base.UseItem(player);
+            player.AddBuff(mod.BuffType(stands[rand.Next(stands.Length)]), 239);
+
+            return true;
         }
     }
 }

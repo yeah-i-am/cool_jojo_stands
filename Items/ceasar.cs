@@ -24,11 +24,11 @@ namespace cool_jojo_stands.Items
             item.useTime = 47;
             item.useAnimation = 47;
             item.useStyle = 4;
-            item.consumable = true;
             item.value = Item.buyPrice(0, 0, 0, 47);
             item.rare = 11;
             item.expert = true;
             item.UseSound = SoundID.NPCDeath1;
+            item.consumable = true;
         }
 
         public override void AddRecipes()
@@ -42,9 +42,9 @@ namespace cool_jojo_stands.Items
 
         public override bool UseItem(Player player)
         {
-            this.ConsumeItem(player);
             StandoPlayer.Talk("Shit ceasar");
-            return base.UseItem(player);
+
+            return true;
         }
     }
 }

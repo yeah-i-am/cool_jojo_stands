@@ -7,7 +7,6 @@ namespace cool_jojo_stands.Items.Armor
     [AutoloadEquip(EquipType.Head)]
     public class AvdolCap : ModItem
     {
-        bool Set = false;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Avdol head");
@@ -25,7 +24,7 @@ namespace cool_jojo_stands.Items.Armor
 
         public override bool IsArmorSet(Item head, Item body, Item legs)
         {
-            return (Set = (body.type == mod.ItemType<AvdolCoat>() && legs.type == mod.ItemType<AvdolLegs>()));
+            return body.type == mod.ItemType<AvdolCoat>() && legs.type == mod.ItemType<AvdolLegs>();
         }
 
         public override void UpdateArmorSet(Player player)

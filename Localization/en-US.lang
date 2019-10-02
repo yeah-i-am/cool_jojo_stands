@@ -35,6 +35,17 @@ ItemTooltip.AvdolCoat = Oh, are you from Egypt?
 ItemName.AvdolLegs = Avdol pants
 ItemTooltip.AvdolLegs = So comfortable that they can revive a dead
 
+  /* Kakyoin */
+
+ItemName.KakyoinCap = Kakyoin hair
+ItemTooltip.KakyoinCap = Ebaniy hvost
+
+ItemName.KakyoinCoat = Kakyoin coat
+ItemTooltip.KakyoinCoat = Perfect green
+
+ItemName.KakyoinLegs = Kakyoin pants
+ItemTooltip.KakyoinLegs = Nice.
+
 /*********
  * Items *
  *********/

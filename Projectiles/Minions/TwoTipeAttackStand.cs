@@ -175,6 +175,12 @@ namespace cool_jojo_stands.Projectiles.Minions
 
                 AUA = atacking = false;
             }
+            if (Vector2.Distance(player.Center, projectile.Center) > maxPlayerDist + 239)
+            {
+                projectile.position = player.Center - new Vector2(30f * player.direction, 30f);
+                TargetDist = 0;
+                NewVelocity = new Vector2(0, 0);
+            }
 
             /***************************
              * Processing speed(wagon) *
@@ -187,12 +193,15 @@ namespace cool_jojo_stands.Projectiles.Minions
                 }
                 else
                 {
-                    float temp = inertia / 2f;
+                    float temp = inertia * 0.5f;
                     NewVelocity = (projectile.velocity * temp + Direction * chasePlayerSpeed) / (temp + 1);
                 }
             }
             else
-                NewVelocity /= 1.2f;
+                NewVelocity *= 0.833333333f;
+
+            if (NewVelocity.HasNaNs())
+                NewVelocity = projectile.velocity;  // This is bug fix ^_^
 
             if (projectile.velocity.Length() > maxSpeed)
             {

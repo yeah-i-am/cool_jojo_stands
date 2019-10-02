@@ -8,7 +8,6 @@ namespace cool_jojo_stands.Items.Armor
     [AutoloadEquip(EquipType.Head)]
     public class JotaroCap : ModItem
     {
-        bool Set = false;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Jotaro Cap");
@@ -26,7 +25,7 @@ namespace cool_jojo_stands.Items.Armor
 
         public override bool IsArmorSet(Item head, Item body, Item legs)
         {
-            return (Set = (body.type == mod.ItemType<JotaroCoat>() && legs.type == mod.ItemType<JotaroLeggins>()));
+            return body.type == mod.ItemType<JotaroCoat>() && legs.type == mod.ItemType<JotaroLeggins>();
         }
 
         public override void UpdateArmorSet(Player player)

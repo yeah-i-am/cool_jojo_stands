@@ -6,12 +6,12 @@ using Terraria.ModLoader;
 namespace cool_jojo_stands.Items.Armor
 {
     [AutoloadEquip(EquipType.Head)]
-    public class KakyoinCap : ModItem
+    public class JosephCap : ModItem
     {
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Kakyoin Hair");
-            Tooltip.SetDefault("Ebaniy hvost");
+            DisplayName.SetDefault("Joseph Head");
+            Tooltip.SetDefault("...");
         }
 
         public override void SetDefaults()
@@ -25,23 +25,23 @@ namespace cool_jojo_stands.Items.Armor
 
         public override bool IsArmorSet(Item head, Item body, Item legs)
         {
-            return body.type == mod.ItemType<KakyoinCoat>() && legs.type == mod.ItemType<KakyoinLeggins>();
+            return body.type == mod.ItemType<JotaroCoat>() && legs.type == mod.ItemType<JotaroLeggins>();
         }
 
         public override void UpdateArmorSet(Player player)
         {
-            player.setBonus = "nothing";
+            player.setBonus = "Hermit Purple became powerful";
             StandoPlayer pl = player.GetModPlayer<StandoPlayer>(mod);
             pl.HaveStandUpSet = true;
-            pl.StandKakyoinSetBonus = 1;
+            pl.StandJotaroSetBonus = 1;
         }
 
         public override void AddRecipes()
         {
             ModRecipe recipe = new ModRecipe(mod);
             recipe.AddIngredient(ItemID.Silk, 20);
-            recipe.AddIngredient(ItemID.PinkGel, 4);
-            recipe.AddIngredient(ItemID.Ruby, 1);
+            recipe.AddIngredient(ItemID.Hay, 17);
+            recipe.AddIngredient(ItemID.HellstoneBar, 13);
             recipe.AddTile(TileID.Anvils);
             recipe.SetResult(this);
             recipe.AddRecipe();
