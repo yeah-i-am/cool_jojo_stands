@@ -220,7 +220,7 @@ namespace cool_jojo_stands.Projectiles.Minions
         public override void CheckActive()
         {
             Player player = Main.player[projectile.owner];
-            StandoPlayer pl = player.GetModPlayer<StandoPlayer>(mod);
+            StandoPlayer pl = player.GetModPlayer<StandoPlayer>();
 
             if (pl.HaveStand)
                 projectile.timeLeft = 2;

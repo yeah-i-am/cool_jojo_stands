@@ -28,11 +28,29 @@ namespace cool_jojo_stands
         }
 
         [Header("UI Settings")]
+
         [Label("Level info position")]
         [SliderColor(0, 255, 100)]
         [DefaultValue(UIPos.Top)]
         [ReloadRequired]
         [DrawTicks]
         public UIPos LvlPos { get; set; }
+
+        [Header("Sounds Settings")]
+
+        [Label("Stand summon sound volume")]
+        [DefaultValue(100)]
+        [Range(0, 100)]
+        [Increment(1)]
+        [Slider]
+        public int StandSummonSoundVolume { get; set; }
+
+
+        [Label("Stand bullets sound volume")]
+        [DefaultValue(100)]
+        [Range(0, 100)]
+        [Increment(1)]
+        [Slider]
+        public int StandBulletSoundVolume { get; set; }
     }
 }

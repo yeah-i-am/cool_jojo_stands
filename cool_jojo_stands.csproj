@@ -19,4 +19,9 @@
     <None Remove="cool_jojo_stands.zip" />
     <None Remove="icon_old.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="MySql.Data">
+      <HintPath>lib\MySql.Data.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

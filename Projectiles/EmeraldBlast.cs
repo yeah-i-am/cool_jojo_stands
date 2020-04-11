@@ -27,6 +27,7 @@ namespace cool_jojo_stands.Projectiles
             projectile.ranged = true;
             projectile.tileCollide = true;
             projectile.ignoreWater = true;
+            projectile.netUpdate = true;
         }
 
         public override bool? CanCutTiles() => true;
@@ -70,9 +71,9 @@ namespace cool_jojo_stands.Projectiles
             projectile.penetrate--;
 
             Player player = Main.player[projectile.owner];
-            StandoPlayer pl = player.GetModPlayer<StandoPlayer>(mod);
+            StandoPlayer pl = player.GetModPlayer<StandoPlayer>();
 
-            damage *= 2 * pl.StandLevel;
+            damage *= 3 * (pl.StandLevel - 1) + 1;
 
             base.ModifyHitNPC(target, ref damage, ref knockback, ref crit, ref hitDirection);
         }

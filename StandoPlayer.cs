@@ -1,6 +1,11 @@
-﻿using System;
+﻿/***************************************************************
+ * Copyright (C) 2019-2020       G@yLord239
+ * No part of this file may be changed without agreement of
+ * G@yLord239
+ ***************************************************************/
+
+using System;
 using System.Collections.Generic;
-using System.IO;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
@@ -8,6 +13,11 @@ using Terraria.GameInput;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
+using Terraria.Localization;
+using cool_jojo_stands.NPCs;
+using cool_jojo_stands.SpecialAbilities;
+using cool_jojo_stands.Projectiles;
+using cool_jojo_stands.Projectiles.Minions;
 
 namespace cool_jojo_stands
 {
@@ -23,6 +33,7 @@ namespace cool_jojo_stands
         public bool HaveHarmitPurpleStand = false;
         public bool HaveHierophantGreenStand = false;
         public bool HaveSilverChariotStand = false;
+        public bool HaveStarPlatinumRequiem = false;
 
         /* Time stop variable */
         public bool InvincibilityInStopTime = false;
@@ -34,6 +45,7 @@ namespace cool_jojo_stands
         public int StandJosephSetBonus = 0;
         public int StandKakyoinSetBonus = 0;
         public int StandPornoleffSetBonus = 0;
+        public int StandFrolohSetBonus = 0;
 
         public string StandBuffName = "";
 
@@ -47,6 +59,9 @@ namespace cool_jojo_stands
         public bool StandManualControl = false;
         public bool StandSpawned = false;
         public bool StandJustSpawned = false;
+
+        /* Stand */
+        public int StandId = -1;
 
         /*********************
          * Utility functions *
@@ -64,32 +79,99 @@ namespace cool_jojo_stands
         /* Send message to chat */
         public static void Talk(string message)
         {
-            if (Main.netMode != 2)
-                Main.NewText(message, 150, 250, 150);
+            Color messageColor = new Color(150, 250, 150);
+
+            if (Main.netMode == 2) // Server
+                NetMessage.BroadcastChatMessage(NetworkText.FromKey(message), messageColor);
+            else
+                Main.NewText(message, messageColor);
         }
-        
+
+        /* Send message to chat with color */
+        public static void Talk(string message, Color messageColor)
+        {
+            if (Main.netMode == 2) // Server
+                NetMessage.BroadcastChatMessage(NetworkText.FromKey(message), messageColor);
+            else
+                Main.NewText(message, messageColor);
+        }
+
         /* Level up processing */
         bool CheckLevelUp()
         {
+            if (StandLevel > MaxStandLevel)
+            {
+                StandLevel = MaxStandLevel;
+                StandXP = 0f;
+                StandNeedToUpXP = 1f;
+                return false;
+            }
+
             if (StandXP >= StandNeedToUpXP)
             {
                 StandXP -= StandNeedToUpXP;
                 StandLevel++;
-                StandNeedToUpXP = (int)(Math.Pow(StandLevel, 1.4) * 3000); // New xp to level up
+
+                if (StandLevel == MaxStandLevel)
+                {
+                    StandXP = 0f;
+                    StandNeedToUpXP = 1f;
+                }
+                else
+                    StandNeedToUpXP = (int)(Math.Pow(StandLevel, 1.4) * 3000); // New xp to level up
+
+                CombatText.NewText(new Rectangle((int)player.position.X, (int)player.position.Y, player.width, player.height), Color.Aquamarine, "New LVL!", true, false);
+
+                int proj = Projectile.NewProjectile(Main.player[Main.myPlayer].Center, new Vector2(0, -8f), ProjectileID.RocketFireworksBoxYellow, 0, 0f);
+
+                Main.projectile[proj].timeLeft = 30;
+
                 return true;
             }
 
             return false;
         }
 
-        /* Check projectile */
-        private bool CheckStando(Projectile proj) =>
-            proj.type == mod.ProjectileType<Projectiles.Minions.HierophantGreen>() ||
-            proj.type == mod.ProjectileType<Projectiles.Minions.MagicianRed>() ||
-            proj.type == mod.ProjectileType<Projectiles.Minions.StarPlatinum>() ||
-            proj.type == mod.ProjectileType<Projectiles.FireBlast>() ||
-            proj.type == mod.ProjectileType<Projectiles.EmeraldBlast>();
+        /* Delete player stand */
+        public void DeleteStand()
+        {
+            if (StandSpawned)
+            {
+                Main.projectile[StandId].Kill();
+                StandSpawned = false;
+            }
 
+            if (HaveStarPlatinum)
+            {
+                player.ClearBuff(ModContent.BuffType<Buffs.StarPlatinumStand>());
+                HaveStarPlatinum = false;
+            }
+            else if (HaveMagicianRedStand)
+            {
+                player.ClearBuff(ModContent.BuffType<Buffs.MagicianRedStand>());
+                HaveMagicianRedStand = false;
+            }
+            else if (HaveHierophantGreenStand)
+            {
+                player.ClearBuff(ModContent.BuffType<Buffs.HierophantGreenStand>());
+                HaveHierophantGreenStand = false;
+            }
+            else if (HaveHarmitPurpleStand)
+            {
+                player.ClearBuff(ModContent.BuffType<Buffs.HermitPurpleStand>());
+                HaveHarmitPurpleStand = false;
+            }
+            else if (HaveStarPlatinumRequiem)
+            {
+                player.ClearBuff(ModContent.BuffType<Buffs.StarPlatinumRequiemStand>());
+                HaveStarPlatinumRequiem = false;
+            }
+            else if (HaveSilverChariotStand)
+            {
+                player.ClearBuff(ModContent.BuffType<Buffs.SilverChariotStand>());
+                HaveSilverChariotStand = false;
+            }
+        }
 
         /********************
          * Player functions *
@@ -118,23 +200,26 @@ namespace cool_jojo_stands
 
                 if (HaveStarPlatinum)
                 {
-                    Main.PlaySound(mod.GetLegacySoundSlot(SoundType.Custom, "Sounds/Custom/Star_Platinum"), player.Center);
+                    Main.PlaySound(
+                        mod.GetLegacySoundSlot(SoundType.Custom, "Sounds/Custom/Star_Platinum").WithVolume(cool_jojo_stands.summonVolume),
+                        player.Center);
 
-                    Projectile.NewProjectile(player.position.X + (float)(player.width / 2), player.position.Y + (float)(player.height / 2) + 15,
-                        0f, 0f, mod.ProjectileType("StarPlatinum"), StandLevel, 5f, player.whoAmI, 0f, 0f);
+                    StandId = Projectile.NewProjectile(player.position.X + (float)(player.width / 2), player.position.Y + (float)(player.height / 2) + 15,
+                        0f, 0f, mod.ProjectileType("StarPlatinum"), 1, 5f, player.whoAmI, 0f, 0f);
                 }
                 else if (HaveMagicianRedStand)
                 {
-                    Projectile.NewProjectile(player.position.X + (float)(player.width / 2), player.position.Y + (float)(player.height / 2) + 15,
-                        0f, 0f, mod.ProjectileType<Projectiles.Minions.MagicianRed>(), StandLevel, 2.0f, player.whoAmI, 2f, 0f);
+                    StandId = Projectile.NewProjectile(player.position.X + (float)(player.width / 2), player.position.Y + (float)(player.height / 2) + 15,
+                        0f, 0f, ModContent.ProjectileType<MagicianRed>(), StandLevel, 2.0f, player.whoAmI, 2f, 0f);
                 }
                 else if (HaveHierophantGreenStand)
                 {
-                    Main.PlaySound(mod.GetLegacySoundSlot(SoundType.Custom, "Sounds/Custom/Hierophant_Green"), player.Center);
+                    Main.PlaySound(
+                        mod.GetLegacySoundSlot(SoundType.Custom, "Sounds/Custom/Hierophant_Green").WithVolume(cool_jojo_stands.summonVolume),
+                        player.Center);
 
-                    Projectile.NewProjectile(player.position.X + (float)(player.width / 2), player.position.Y + (float)(player.height / 2),
-                        0, 0, mod.ProjectileType<Projectiles.Minions.HierophantGreen>(), StandLevel, 2.0f, player.whoAmI, 1.5f, 0f);
-
+                    StandId = Projectile.NewProjectile(player.position.X + (float)(player.width / 2), player.position.Y + (float)(player.height / 2),
+                        0, 0, ModContent.ProjectileType<HierophantGreen>(), 1, 2.0f, player.whoAmI, 1.5f, 0f);
                 }
                 else if (HaveHarmitPurpleStand)
                 {
@@ -142,10 +227,28 @@ namespace cool_jojo_stands
                     Dir.Normalize();
                     Dir *= 24f;
 
-                    int proj = Projectile.NewProjectile(player.position.X + (float)(player.width / 2), player.position.Y + (float)(player.height / 2),
-                        Dir.X, Dir.Y, mod.ProjectileType<Projectiles.HermitPurple>(), StandLevel, 2.0f, player.whoAmI, 0f, 0f);
+                    StandId = Projectile.NewProjectile(player.position.X + (float)(player.width / 2), player.position.Y + (float)(player.height / 2),
+                        Dir.X, Dir.Y, ModContent.ProjectileType<HermitPurple>(), StandLevel, 2.0f, player.whoAmI, 0f, 0f);
 
                     StandSpawned = false;
+                }
+                else if (HaveStarPlatinumRequiem)
+                {
+                    Main.PlaySound(
+                        mod.GetLegacySoundSlot(SoundType.Custom, "Sounds/Custom/Star_Platinum").WithVolume(cool_jojo_stands.summonVolume),
+                        player.Center);
+
+                    StandId = Projectile.NewProjectile(player.position.X + (float)(player.width / 2), player.position.Y + (float)(player.height / 2) + 15,
+                        0f, 0f, mod.ProjectileType("StarPlatinumRequiem"), 1, 5f, player.whoAmI, 0f, 0f);
+                }
+                else if (HaveSilverChariotStand)
+                {
+                    Main.PlaySound(
+                        mod.GetLegacySoundSlot(SoundType.Custom, "Sounds/Custom/Silver_Chariot").WithVolume(cool_jojo_stands.summonVolume),
+                        player.Center);
+
+                    StandId = Projectile.NewProjectile(player.position.X + (float)(player.width / 2), player.position.Y + (float)(player.height / 2) + 15,
+                        0f, 0f, ModContent.ProjectileType<SilverChariot>(), 1, 5f, player.whoAmI, 0f, 0f);
                 }
             }
             else if (cool_jojo_stands.SwitchStandControlHT.JustPressed)
@@ -155,39 +258,61 @@ namespace cool_jojo_stands
             else if (cool_jojo_stands.SpecialAbilityHT.JustPressed)
             {
                 //Utils.CutSceneManager.Scenes["Test"].Activate();
+                if ((HaveStarPlatinum && StandLevel >= 40) || (HaveStarPlatinumRequiem && StandLevel >= 10))
+                {
+                    if (Main.netMode == NetmodeID.MultiplayerClient)
+                    {
+                        ModPacket packet = cool_jojo_stands.mod.GetPacket();
+
+                        packet.Write((byte)cool_jojo_stands.StandMessageType.TimeStopActivate);
+                        packet.Write(player.whoAmI);
+
+                        packet.Send();
+                    }
+
+                    Utils.SpecialAbilityManager.Abilities["ZaWardo"].GetAbilty<ZaWardo>().Init(player.whoAmI);
+                    Utils.SpecialAbilityManager.Activate("ZaWardo");
+                }
+                else if (HaveSilverChariotStand)
+                {
+                    Utils.SpecialAbilityManager.Abilities["SCA"].GetAbilty<SilverChariotAbility>().Init(player.whoAmI);
+                    Utils.SpecialAbilityManager.Activate("SCA");
+                }
             }
         }
 
         /* Reset effects after dead */
         public override void ResetEffects()
         {
-            /* Save stand after dead */
-            if (HaveStarPlatinum)
-                player.AddBuff(mod.BuffType<Buffs.StarPlatinumStand>(), 300);
-            else if (HaveMagicianRedStand)
-                player.AddBuff(mod.BuffType<Buffs.MagicianRedStand>(), 300);
-            else if (HaveHarmitPurpleStand)
-                player.AddBuff(mod.BuffType<Buffs.HermitPurpleStand>(), 300);
-            else if (HaveHierophantGreenStand)
-                player.AddBuff(mod.BuffType<Buffs.HierophantGreenStand>(), 300);
+            if (!HaveStandUpSet)
+                StandJotaroSetBonus = StandAvdolSetBonus =
+                    StandJosephSetBonus = StandKakyoinSetBonus = StandPornoleffSetBonus = 0;
         }
 
         /* Pre update function */
         public override void PreUpdate()
         {
-            if (!HaveStandUpSet)
-                StandJotaroSetBonus = StandAvdolSetBonus = StandJosephSetBonus = StandKakyoinSetBonus = StandPornoleffSetBonus = 0;
-
             if (CheckLevelUp())
-                Talk("Congratulations! Your stand level increased: " + StandLevel.ToString());
-
-            Utils.CutSceneManager.Update();
+                if (StandLevel == MaxStandLevel)
+                    Talk("Congratulations! Your got the MAXIMUM stand level!");
+                else
+                    Talk("Congratulations! Your stand level increased: " + StandLevel.ToString());
         }
 
         /* Post update function */
         public override void PostUpdate()
         {
             HaveStandUpSet = false;
+            player.oldVelocity = player.velocity;
+        }
+
+        public override void PreUpdateMovement()
+        {
+            if (player.grapCount > 0
+                && Main.projectile[player.grappling[0]].type == ModContent.ProjectileType<Projectiles.HermitPurple>())
+            {
+                (Main.projectile[player.grappling[0]].modProjectile as Projectiles.HermitPurple).SwingUpdate();
+            }
         }
 
         /* Pre hurt function */
@@ -199,29 +324,16 @@ namespace cool_jojo_stands
             return base.PreHurt(pvp, quiet, ref damage, ref hitDirection, ref crit, ref customDamage, ref playSound, ref genGore, ref damageSource);
         }
 
-        /* Clone client function
-         * for future
-         */
-        public override void clientClone(ModPlayer clientClone)
-        {
-        }
-
-        /* Initializing player data function
-         */
-        public override void Initialize()
-        {
-            /// TODO: check xp
-        }
-
         /* Save player data function */
         public override TagCompound Save()
         {
-            TagCompound Data = new TagCompound();
-
-            Data.Add("StandXP", StandXP);
-            Data.Add("StandLVL", StandLevel);
-            Data.Add("StandLVLUP", StandNeedToUpXP);
-            Data.Add("BuffName", StandBuffName);
+            TagCompound Data = new TagCompound
+            {
+                { "StandXP", StandXP },
+                { "StandLVL", StandLevel },
+                { "StandLVLUP", StandNeedToUpXP },
+                { "BuffName", StandBuffName }
+            };
 
             return Data;
         }
@@ -273,19 +385,21 @@ namespace cool_jojo_stands
         /*******************************
          * New Level System Processing *
          *******************************/
-        public override void OnHitNPC(Item item, NPC target, int damage, float knockback, bool crit)
-        {
-            if (target.life <= 0 && !target.SpawnedFromStatue && StandLevel <= MaxStandLevel)
-                StandXP += target.lifeMax * 0.1f;
-        }
-
-        public override void OnHitNPCWithProj(Projectile proj, NPC target, int damage, float knockback, bool crit)
+        public void NPCDeadGetXP( NPC target )
         {
             if (target.life <= 0 && !target.SpawnedFromStatue && StandLevel < MaxStandLevel)
-              if (CheckStando(proj))
-                    StandXP += target.lifeMax * 0.3f;
-                else
-                    StandXP += target.lifeMax * 0.1f;
+            {
+                int dmgPlayer = target.GetGlobalNPC<GlobalStandNPC>().DamageFromPlayer(player.whoAmI);
+                int dmgStand = target.GetGlobalNPC<GlobalStandNPC>().DamageFromStand(player.whoAmI);
+
+                float XP = dmgPlayer * 0.1f + dmgStand * 0.3f;
+
+                StandXP += XP;
+
+                if (XP > 0.8f)
+                    CombatText.NewText(new Rectangle((int)player.position.X, (int)player.position.Y - 25, player.width, player.height),
+                        Color.HotPink, Convert.ToInt32(XP).ToString() + "xp", true, false);
+            }
         }
 
         /* Cutscene screen position */

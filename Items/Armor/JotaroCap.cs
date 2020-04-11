@@ -25,13 +25,13 @@ namespace cool_jojo_stands.Items.Armor
 
         public override bool IsArmorSet(Item head, Item body, Item legs)
         {
-            return body.type == mod.ItemType<JotaroCoat>() && legs.type == mod.ItemType<JotaroLeggins>();
+            return body.type == ModContent.ItemType<JotaroCoat>() && legs.type == ModContent.ItemType<JotaroLeggins>();
         }
 
         public override void UpdateArmorSet(Player player)
         {
             player.setBonus = "Star Platinum became faster";
-            StandoPlayer pl = player.GetModPlayer<StandoPlayer>(mod);
+            StandoPlayer pl = player.GetModPlayer<StandoPlayer>();
             pl.HaveStandUpSet = true;
             pl.StandJotaroSetBonus = 1;
         }
@@ -46,7 +46,7 @@ namespace cool_jojo_stands.Items.Armor
         {
             ModRecipe recipe = new ModRecipe(mod);
             recipe.AddIngredient(ItemID.Silk, 20);
-            recipe.AddIngredient(ItemID.GoldBar, 10);
+            recipe.AddRecipeGroup("CoolJoJoStands:GoldOrPlatinum", 10);
             recipe.AddIngredient(ItemID.Obsidian, 12);
             recipe.AddTile(TileID.Anvils);
             recipe.SetResult(this);

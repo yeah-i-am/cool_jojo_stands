@@ -83,7 +83,7 @@ namespace cool_jojo_stands.Projectiles
             projectile.penetrate--;
 
             Player player = Main.player[projectile.owner];
-            StandoPlayer pl = player.GetModPlayer<StandoPlayer>(mod);
+            StandoPlayer pl = player.GetModPlayer<StandoPlayer>();
 
             damage *= 2 * pl.StandLevel;
 

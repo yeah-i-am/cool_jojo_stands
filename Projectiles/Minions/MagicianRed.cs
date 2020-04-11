@@ -28,14 +28,17 @@ namespace cool_jojo_stands.Projectiles.Minions
             projectile.ignoreWater = true;
             projectile.alpha = 30;
 
-            Shoot = mod.ProjectileType<FireBlast>();
+            Shoot = ModContent.ProjectileType<FireBlast>();
             ShootVel = 12f;
         }
 
         public override void SelectFrame()
         {
+            if (projectile.alpha > 30)
+                projectile.alpha -= 8;
+
             Player player = Main.player[projectile.owner];
-            StandoPlayer pl = player.GetModPlayer<StandoPlayer>(mod);
+            StandoPlayer pl = player.GetModPlayer<StandoPlayer>();
 
             if (pl.StandAvdolSetBonus == 1)
                 TypeOfAttack = 1;
@@ -75,7 +78,7 @@ namespace cool_jojo_stands.Projectiles.Minions
         public override void CreateDust()
         {
             Player player = Main.player[projectile.owner];
-            StandoPlayer pl = player.GetModPlayer<StandoPlayer>(mod);
+            StandoPlayer pl = player.GetModPlayer<StandoPlayer>();
 
             Lighting.AddLight(projectile.position + projectile.Size / 2, 0.7f, 0f, 0f);
 
@@ -140,7 +143,7 @@ namespace cool_jojo_stands.Projectiles.Minions
         public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
             Player player = Main.player[projectile.owner];
-            StandoPlayer pl = player.GetModPlayer<StandoPlayer>(mod);
+            StandoPlayer pl = player.GetModPlayer<StandoPlayer>();
 
             damage *= (pl.StandLevel * pl.StandLevel) + pl.StandLevel;
 

@@ -24,13 +24,13 @@ namespace cool_jojo_stands.Items.Armor
 
         public override bool IsArmorSet(Item head, Item body, Item legs)
         {
-            return body.type == mod.ItemType<AvdolCoat>() && legs.type == mod.ItemType<AvdolLegs>();
+            return body.type == ModContent.ItemType<AvdolCoat>() && legs.type == ModContent.ItemType<AvdolLegs>();
         }
 
         public override void UpdateArmorSet(Player player)
         {
             player.setBonus = "Magican Red became powerful";
-            StandoPlayer pl = player.GetModPlayer<StandoPlayer>(mod);
+            StandoPlayer pl = player.GetModPlayer<StandoPlayer>();
             pl.HaveStandUpSet = true;
             pl.StandAvdolSetBonus = 1;
         }
@@ -39,7 +39,7 @@ namespace cool_jojo_stands.Items.Armor
         {
             ModRecipe recipe = new ModRecipe(mod);
             recipe.AddIngredient(ItemID.Silk, 20);
-            recipe.AddIngredient(ItemID.GoldBar, 10);
+            recipe.AddRecipeGroup("CoolJoJoStands:GoldOrPlatinum", 10);
             recipe.AddIngredient(ItemID.HellstoneBar, 8);
             recipe.AddTile(TileID.Anvils);
             recipe.SetResult(this);

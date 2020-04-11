@@ -25,13 +25,13 @@ namespace cool_jojo_stands.Items.Armor
 
         public override bool IsArmorSet(Item head, Item body, Item legs)
         {
-            return body.type == mod.ItemType<KakyoinCoat>() && legs.type == mod.ItemType<KakyoinLeggins>();
+            return body.type == ModContent.ItemType<KakyoinCoat>() && legs.type == ModContent.ItemType<KakyoinLeggins>();
         }
 
         public override void UpdateArmorSet(Player player)
         {
             player.setBonus = "nothing";
-            StandoPlayer pl = player.GetModPlayer<StandoPlayer>(mod);
+            StandoPlayer pl = player.GetModPlayer<StandoPlayer>();
             pl.HaveStandUpSet = true;
             pl.StandKakyoinSetBonus = 1;
         }

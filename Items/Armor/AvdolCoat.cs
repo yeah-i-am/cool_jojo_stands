@@ -38,7 +38,7 @@ namespace cool_jojo_stands.Items.Armor
         {
             ModRecipe recipe = new ModRecipe(mod);
             recipe.AddIngredient(ItemID.Silk, 24);
-            recipe.AddIngredient(ItemID.GoldBar, 13);
+            recipe.AddRecipeGroup("CoolJoJoStands:GoldOrPlatinum", 13);
             recipe.AddIngredient(ItemID.HellstoneBar, 7);
             recipe.AddTile(TileID.Anvils);
             recipe.SetResult(this);

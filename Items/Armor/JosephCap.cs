@@ -25,13 +25,13 @@ namespace cool_jojo_stands.Items.Armor
 
         public override bool IsArmorSet(Item head, Item body, Item legs)
         {
-            return body.type == mod.ItemType<JotaroCoat>() && legs.type == mod.ItemType<JotaroLeggins>();
+            return body.type == ModContent.ItemType<JotaroCoat>() && legs.type == ModContent.ItemType<JotaroLeggins>();
         }
 
         public override void UpdateArmorSet(Player player)
         {
             player.setBonus = "Hermit Purple became powerful";
-            StandoPlayer pl = player.GetModPlayer<StandoPlayer>(mod);
+            StandoPlayer pl = player.GetModPlayer<StandoPlayer>();
             pl.HaveStandUpSet = true;
             pl.StandJotaroSetBonus = 1;
         }
