@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.GameInput;
 using Terraria.ModLoader;
+using Terraria.ID;
 
 namespace cool_jojo_stands.Buffs
 {
@@ -11,7 +12,8 @@ namespace cool_jojo_stands.Buffs
         public override void SetDefaults()
         {
             DisplayName.SetDefault("You are the owner of Hierophant Green");
-            Description.SetDefault("nO oNe CaN jUsT dEfLeCt ThE eMeRaLd SpLaSh");
+            Description.SetDefault("nO oNe CaN jUsT dEfLeCt ThE eMeRaLd SpLaSh\n"
+                + "Special Ability: None");
             Main.buffNoSave[Type] = false; // false
             canBeCleared = false;
             Main.buffNoTimeDisplay[Type] = true;
@@ -20,7 +22,7 @@ namespace cool_jojo_stands.Buffs
 
         public override void Update(Player player, ref int buffIndex)
         {
-            StandoPlayer StandPlayer = player.GetModPlayer<StandoPlayer>(mod);
+            StandoPlayer StandPlayer = player.GetModPlayer<StandoPlayer>();
 
             if (!StandPlayer.HaveHierophantGreenStand)
             {
@@ -30,6 +32,11 @@ namespace cool_jojo_stands.Buffs
             }
 
             player.buffTime[buffIndex] = 2390;
+        }
+
+        public override void ModifyBuffTip(ref string tip, ref int rare)
+        {
+            rare = ItemRarityID.Green;
         }
     }
 }

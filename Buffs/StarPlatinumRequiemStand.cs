@@ -2,18 +2,17 @@
 using Terraria.GameInput;
 using Terraria.ModLoader;
 using Terraria.ID;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace cool_jojo_stands.Buffs
 {
-    public class StarPlatinumStand : ModBuff
+    public class StarPlatinumRequiemStand : ModBuff
     {
         public override void SetDefaults()
         {
-            DisplayName.SetDefault("You are the owner of Star Platinum");
-            Description.SetDefault("This is melee stand, very fast\n"
+            DisplayName.SetDefault("You are the owner of Star Platinum Requiem");
+            Description.SetDefault("This is Dolphin\n"
                 + "Special Ability: Time Stop\n"
-                + "Ability opens after level 40");
+                + "Ability opens after level 10");
             Main.buffNoSave[Type] = false;
             canBeCleared = false;
             Main.buffNoTimeDisplay[Type] = true;
@@ -24,19 +23,19 @@ namespace cool_jojo_stands.Buffs
         {
             StandoPlayer StandPlayer = player.GetModPlayer<StandoPlayer>();
 
-            if (!StandPlayer.HaveStarPlatinum)
+            if (!StandPlayer.HaveStarPlatinumRequiem)
             {
-                StandPlayer.HaveStarPlatinum = true;
+                StandPlayer.HaveStarPlatinumRequiem = true;
                 StandPlayer.HaveStand = true;
-                StandPlayer.StandBuffName = "StarPlatinum";
+                StandPlayer.StandBuffName = "StarPlatinumRequiem";
             }
 
             player.buffTime[buffIndex] = 2390;
         }
-
         public override void ModifyBuffTip(ref string tip, ref int rare)
         {
             rare = ItemRarityID.Purple;
         }
     }
+
 }

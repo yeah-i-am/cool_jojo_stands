@@ -12,7 +12,7 @@ namespace cool_jojo_stands.Buffs
         {
             DisplayName.SetDefault("You are the owner of Hermit Purple");
             Description.SetDefault("Oh...");
-            Main.buffNoSave[Type] = false; // false
+            Main.buffNoSave[Type] = false;
             canBeCleared = false;
             Main.buffNoTimeDisplay[Type] = true;
             Main.debuff[Type] = true;
@@ -20,7 +20,7 @@ namespace cool_jojo_stands.Buffs
 
         public override void Update(Player player, ref int buffIndex)
         {
-            StandoPlayer StandPlayer = player.GetModPlayer<StandoPlayer>(mod);
+            StandoPlayer StandPlayer = player.GetModPlayer<StandoPlayer>();
 
             if (!StandPlayer.HaveHarmitPurpleStand)
             {
