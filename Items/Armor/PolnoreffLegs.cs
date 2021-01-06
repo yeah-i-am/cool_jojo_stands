@@ -5,12 +5,12 @@ using Terraria.ID;
 namespace cool_jojo_stands.Items.Armor
 {
     [AutoloadEquip(EquipType.Legs)]
-    public class KakyoinLeggins : ModItem
+    public abstract class PolnareffLegs : ModItem
     {
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Kakyoin pants");
-            Tooltip.SetDefault("Nice.");
+            DisplayName.SetDefault("Polnareff pants");
+            Tooltip.SetDefault("...");
         }
 
         public override void SetDefaults()
@@ -24,16 +24,16 @@ namespace cool_jojo_stands.Items.Armor
 
         public override void UpdateEquip(Player player)
         {
-            player.moveSpeed *= 1.05f;
-            player.rangedDamage *= 1.05f;
+            player.moveSpeed *= 1.1f;
+            player.meleeDamage *= 1.05f;
         }
 
         public override void AddRecipes()
         {
             ModRecipe recipe = new ModRecipe(mod);
             recipe.AddIngredient(ItemID.Silk, 22);
-            recipe.AddIngredient(ItemID.Cactus, 22);
-            recipe.AddIngredient(ItemID.Ruby, 1);
+            recipe.AddRecipeGroup("CoolJoJoStands:DemoniteOrCrimtane", 11);
+            recipe.AddIngredient(ItemID.Obsidian, 13);
             recipe.AddTile(TileID.Anvils);
             recipe.SetResult(this);
             recipe.AddRecipe();

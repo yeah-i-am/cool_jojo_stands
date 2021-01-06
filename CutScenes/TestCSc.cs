@@ -24,9 +24,9 @@ namespace cool_jojo_stands.CutScenes
 
         public override void Start()
         {
-            camVel = new Vector2(6f, 0);
-            camPos = Main.screenPosition + new Vector2(-12, -4);
-            camZoom = new Vector2(1, 1);
+            camVel = new Vector2(0f, 0);
+            camPos = Main.screenPosition + new Vector2(-3, -4);
+            camZoom = new Vector2(5, 5);
             progress = 0;
 
             Main.hideUI = true;

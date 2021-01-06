@@ -23,9 +23,9 @@ namespace cool_jojo_stands.Items
             item.height = 40;
             item.useTime = 47;
             item.useAnimation = 47;
-            item.useStyle = 4;
+            item.useStyle = ItemUseStyleID.HoldingUp;
             item.value = Item.buyPrice(0, 0, 0, 47);
-            item.rare = 11;
+            item.rare = ItemRarityID.Purple;
             item.expert = true;
             item.UseSound = SoundID.NPCDeath1;
             item.consumable = true;
@@ -42,7 +42,7 @@ namespace cool_jojo_stands.Items
 
         public override bool UseItem(Player player)
         {
-            StandoPlayer.Talk("Shit ceasar");
+            StandoPlayer.Talk("Well. The mod is closed. There will be no new updates, but thanks for playing with it.");
 
             return true;
         }
