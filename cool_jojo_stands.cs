@@ -18,12 +18,12 @@ using System;
 
 namespace cool_jojo_stands
 {
-	class cool_jojo_stands : Mod
-	{
+    class cool_jojo_stands : Mod
+    {
         public static ModHotKey StandSummonHT, SpecialAbilityHT, SwitchStandControlHT; // Hotkeys
         public static Mod mod; // This mod class
-        public static float summonVolume;
-        public static float standBulletVolume;
+        public static float summonVolume; // Stand summon sound volume
+        public static float standBulletVolume; // Stand bullets summon volume
 
         /* Interface variables */
         private UserInterface StandInterface;
@@ -32,11 +32,13 @@ namespace cool_jojo_stands
 
         internal static StandConfig StandClientConfig; // Config
 
-        public static bool usingSteam = false;
-        public static ulong SteamId = 0;
+        public static bool usingSteam = false; // Is terraria starter via steam flag
+        public static ulong SteamId = 0; // Steam profile id
 
+        /* Mod constructor */
         public cool_jojo_stands()
-		{
+        {
+            /* It needs to support shader version highter than 2.0 */
             if (!Main.Support4K)
             {
                 Main.Support4K = true;
@@ -44,14 +46,16 @@ namespace cool_jojo_stands
                 throw new System.Exception("\n!!! Jojo Stands:\nYour graphic device settings are incorrect. " +
                     "Please restart Terraria and try again(Do not forget to turn on the mod after rebooting)\n!!!\n");
             }
-		}
+        }
 
+        /* Mod loading */
         public override void Load()
         {
-            mod = this;
+            mod = this; // mod
 
             mod.Logger.Info("Starting loading...");
 
+            /* Try to get steam info */
             try
             {
                 usingSteam = Steamworks.SteamAPI.IsSteamRunning();
@@ -77,6 +81,7 @@ namespace cool_jojo_stands
             SpecialAbilityHT = RegisterHotKey("Special ability", "P");
             SwitchStandControlHT = RegisterHotKey("Switch stand control mode", "Home");
 
+            /* Loading special abilities */
             SpecialAbilityManager.Load();
             SpecialAbilityManager.AddAbility("ZaWardo", new ZaWardo());
             SpecialAbilityManager.AddAbility("SCA", new SilverChariotAbility());
@@ -92,12 +97,15 @@ namespace cool_jojo_stands
 
                 StandInterface.SetState(StandoUI);
 
+                /* Cut scene */
                 CutSceneManager.Load();
                 CutSceneManager.AddScene("Test", new CutScenes.TestCSc());
 
+                /* Red dolphin shader */
                 GameShaders.Misc["RedDolphin"] = new MiscShaderData(new Ref<Effect>(GetEffect("Effects/RedDolphin")), "RedDolphine");
 
-                try
+                /* Bonus manager (not needed) */
+                /*try
                 {
                     BonusManager.Init();
 
@@ -109,10 +117,16 @@ namespace cool_jojo_stands
                 catch (Exception e)
                 {
                     mod.Logger.Warn("DB error: " + e.Message);
-                }
+                }*/
             }
 
             mod.Logger.Info("Load successful");
+        }
+
+        /* Post setup content */
+        public override void PostSetupContent()
+        {
+            ItemID.Sets.ExtractinatorMode[ItemID.StoneBlock] = ItemID.StoneBlock;
         }
 
         /* Add recipe groups */
@@ -127,17 +141,17 @@ namespace cool_jojo_stands
 
             RecipeGroup.RegisterGroup("CoolJoJoStands:GoldOrPlatinum", group);
 
-           group = new RecipeGroup(() => Language.GetTextValue("LegacyMisc.37") + " " +
-           Language.GetTextValue("ItemName.DemoniteBar"), new int[]
-           {
+            group = new RecipeGroup(() => Language.GetTextValue("LegacyMisc.37") + " " +
+            Language.GetTextValue("ItemName.DemoniteBar"), new int[]
+            {
                 ItemID.DemoniteBar,
                 ItemID.CrimtaneBar
-           });
+            });
 
             RecipeGroup.RegisterGroup("CoolJoJoStands:DemoniteOrCrimtane", group);
         }
 
-        /* I don't know how it working, but it needs to UI */
+        /* I don't know how it working, but it needs to UI go brrrrr... */
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
             int mouseTextIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
@@ -182,7 +196,7 @@ namespace cool_jojo_stands
                 StandInterface = null;
                 StandoUI = null;
 
-                BonusManager.UnLoad();
+                //BonusManager.UnLoad();
                 CutSceneManager.UnLoad();
             }
 
@@ -213,6 +227,7 @@ namespace cool_jojo_stands
         {
             StandMessageType msgType = (StandMessageType)reader.ReadByte();
 
+            /// debug
             /*if (Main.netMode == NetmodeID.Server) // Server
             {
                 NetMessage.BroadcastChatMessage(NetworkText.FromKey("Server get packet"), Color.Green);
@@ -236,33 +251,35 @@ namespace cool_jojo_stands
                             for (int i = 0; i < n; i++)
                                 NetId[i] = reader.ReadInt32();
 
-                                for (int i = 0; i < n; i++)
-                                  Main.npc[NetId[i]].SpawnedFromStatue = true;
+                            for (int i = 0; i < n; i++)
+                                Main.npc[NetId[i]].SpawnedFromStatue = true;
                         }
                     }
                     break;
 
                 case StandMessageType.TimeStopActivate:
                     int fromWho = reader.ReadInt32();
-                
+
                     if (Main.netMode == NetmodeID.Server)
                     {
                         ModPacket packet = mod.GetPacket();
-                
+
                         packet.Write((byte)StandMessageType.TimeStopActivate);
                         packet.Write(fromWho);
-                
+
                         packet.Send(-1, fromWho);
                     }
-                
+
                     SpecialAbilityManager.Abilities["ZaWardo"].GetAbilty<ZaWardo>().Init(fromWho);
                     SpecialAbilityManager.Activate("ZaWardo");
                     break;
             }
         }
 
+        /* Mid update Player -> NPC */
         public override void MidUpdatePlayerNPC()
         {
+            /* sync npcs from statues to xp manger */
             if (Main.netMode == NetmodeID.Server)
             {
                 List<int> sfs = new List<int>();
@@ -286,11 +303,13 @@ namespace cool_jojo_stands
             }
         }
 
+        /* Pre update */
         public override void PreUpdateEntities()
         {
             Utils.SpecialAbilityManager.PreUpdate();
         }
 
+        /* Post update */
         public override void PostUpdateEverything()
         {
             if (!Main.dedServ)

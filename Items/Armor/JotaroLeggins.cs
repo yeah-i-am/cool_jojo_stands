@@ -18,7 +18,7 @@ namespace cool_jojo_stands.Items.Armor
 			item.width = 18;
 			item.height = 18;
             item.value = Item.buyPrice(0, 3, 47, 0);
-            item.rare = 6;
+            item.rare = ItemRarityID.LightPurple;
 			item.defense = 6;
 		}
 

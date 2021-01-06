@@ -115,10 +115,11 @@ namespace cool_jojo_stands.Utils
         /* Unload scenes function */
         public static void UnLoad()
         {
-            foreach (CutScene scene in Scenes.Values)
-            {
-                scene.UnLoad();
-            }
+            if (Scenes != null)
+              foreach (CutScene scene in Scenes.Values)
+              {
+                  scene.UnLoad();
+              }
 
             Scenes = null;
             Activated = null;

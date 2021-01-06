@@ -187,6 +187,10 @@ namespace cool_jojo_stands.SpecialAbilities
                         .UseOpacity(1.3f)               // Speed
                         .UseColor(AbilityTime, 1, 0.0f) // Stop time, back to normal time, End of 1/2 za wardo skip time
                         .UseSecondaryColor(1, 0, 239);  // End of 1/2 za wardo, negative offset
+
+                Main.PlaySound(
+                           cool_jojo_stands.mod.GetLegacySoundSlot(SoundType.Custom, "Sounds/Custom/SPZaWardoSound").WithVolume(cool_jojo_stands.summonVolume),
+                           Main.player[whoAmI].Center);
             }
         }
 

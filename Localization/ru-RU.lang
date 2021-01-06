@@ -2,11 +2,14 @@
  * Buffs *
  *********/
 
-BuffName.StarPlatinumStand = Вы обладатель Star Platinum
-BuffDescription.StarPlatinumStand = Станд ближнего боя, любит ORAть
+BuffName.StarPlatinumStand =Вы обладатель Star Platinum
+BuffDescription.StarPlatinumStand =Станд ближнего боя, любит ORAть\nСпособность: Остановка времени\nОткрывается после уровня 40
 
-BuffName.MagicianRedStand = Вы обладатель Magician Red
-BuffDescription.MagicianRedStand = Огненный станд, очень горяч
+BuffName.MagicianRedStand =Вы обладатель Magician Red
+BuffDescription.MagicianRedStand =Огненный станд, очень горяч\nСпособность: Нет
+
+BuffName.HierophantGreenStand =Вы обладатель Hierophant Green
+BuffDescription.HierophantGreenStand =nO oNe CaN jUsT dEfLeCt ThE eMeRaLd SpLaSh\nСпособность: Нет
 
 /*********
  * Armor *
@@ -14,47 +17,47 @@ BuffDescription.MagicianRedStand = Огненный станд, очень го�
 
   /* Jorato */
 
-ItemName.JotaroCap = Кепка Джотаро
-ItemTooltip.JotaroCap = Выглядит круто
+ItemName.JotaroCap =Кепка Джотаро
+ItemTooltip.JotaroCap =Выглядит круто
 
-ItemName.JotaroCoat = Плащ Джотаро
-ItemTooltip.JotaroCoat = Это школьная форма?
+ItemName.JotaroCoat =Плащ Джотаро
+ItemTooltip.JotaroCoat =Это школьная форма?
 
-ItemName.JotaroLeggins = Штаны Джотаро
-ItemTooltip.JotaroLeggins = Стоят 20 тысяч йен
+ItemName.JotaroLeggins =Штаны Джотаро
+ItemTooltip.JotaroLeggins =Стоят 20 тысяч йен
 
   /* Avdol */
 
-ItemName.AvdolCap = Причёска Абдула
-ItemTooltip.AvdolCap = Похожа на кактус
+ItemName.AvdolCap =Причёска Абдула
+ItemTooltip.AvdolCap =Похожа на кактус
 
-ItemName.AvdolCoat = Плащ Абдула
-ItemTooltip.AvdolCoat = Оу, ты из Египта?
+ItemName.AvdolCoat =Плащ Абдула
+ItemTooltip.AvdolCoat =Оу, ты из Египта?
 
-ItemName.AvdolLegs = Штаны Абдула
-ItemTooltip.AvdolLegs = Настолько комфортные, что способны оживить мертвеца
+ItemName.AvdolLegs =Штаны Абдула
+ItemTooltip.AvdolLegs =Настолько комфортные, что способны оживить мертвеца
 
   /* Kakyoin */
 
-ItemName.KakyoinCap = Причёчка Какёина
-ItemTooltip.KakyoinCap = Класный хвост
+ItemName.KakyoinCap =Причёчка Какёина
+ItemTooltip.KakyoinCap =Класный хвост
 
-ItemName.KakyoinCoat = Плащ Какёина
-ItemTooltip.KakyoinCoat = Идеальнеый зелёный
+ItemName.KakyoinCoat =Плащ Какёина
+ItemTooltip.KakyoinCoat =Идеальнеый зелёный
 
-ItemName.KakyoinLegs = Штаны Какёина
-ItemTooltip.KakyoinLegs = Класс.
+ItemName.KakyoinLegs =Штаны Какёина
+ItemTooltip.KakyoinLegs =Класс.
 
 
 /*********
  * Items *
  *********/
 
-ItemName.stand_arrow = Стрела стандов
-ItemTooltip.stand_arrow = Для наружного использования
+ItemName.stand_arrow =Стрела стандов
+ItemTooltip.stand_arrow =Для наружного использования
 
 /***************
  * Projectiles *
  ***************/
 
-ProjectileName.StarPlatinum = Star Platinum
+ProjectileName.StarPlatinum =Star Platinum

@@ -419,8 +419,8 @@ namespace cool_jojo_stands.Projectiles.Minions
                         //projectile.StatusNPC(k);
 
                         // Network mode
-                        if (Main.netMode != 0)
-                            NetMessage.SendData(28, -1, -1, Terraria.Localization.NetworkText.FromLiteral(""), k, (float)damage, projectile.knockBack, Math.Sign(Dir.X), crit ? 1 : 0);
+                        if (Main.netMode != NetmodeID.SinglePlayer)
+                            NetMessage.SendData(MessageID.StrikeNPC, -1, -1, Terraria.Localization.NetworkText.FromLiteral(""), k, (float)damage, projectile.knockBack, Math.Sign(Dir.X), crit ? 1 : 0);
 
                         pl.player.addDPS(dmg);
 

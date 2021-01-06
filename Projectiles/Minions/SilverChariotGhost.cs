@@ -12,7 +12,7 @@ namespace cool_jojo_stands.Projectiles.Minions
     public class SilverChariotGhost : Stand
     {
         static int[] targets = new int[10];
-        int id;
+        //int id;
 
         Vector2[] armShift = new Vector2[10];
         float[] armPhase = new float[10];

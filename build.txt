@@ -1,10 +1,9 @@
 author = G@yLord239 and Jen`Ok
-version = 0.3.1.0
+version = 0.3.2.0
 displayName = [c/AF00AF:JoJo Stands] (by G@yLord239)
 hideCode = true
 hideResources = true
 includeSource = false
-dllReferences = MySql.Data
 
 homepage = https://discord.gg/uDW2X7r
 

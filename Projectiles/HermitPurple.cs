@@ -8,6 +8,8 @@ using Terraria.GameInput;
 
 namespace cool_jojo_stands.Projectiles
 {
+    /*     In dev -_-     *
+     * sorry, no comments */
     public class HermitPurple : ModProjectile
     {
         double
@@ -43,7 +45,7 @@ namespace cool_jojo_stands.Projectiles
         double controlAmpl;
 
         int goToControl;
-        const int gtcSpeps = 10;
+        const int gtcSpeps = 3;
 
         public override void SetDefaults()
         {
@@ -203,6 +205,19 @@ namespace cool_jojo_stands.Projectiles
 
                     time += 1.0 / 60.0;
 
+                    /* Roflan slojna */
+                    double a = 0;
+
+                    if (lastColl == 0 && controlAmpl * ampl < 0)
+                        a = (MathHelper.Pi - (swingSpeed * time % MathHelper.TwoPi)) / swingSpeed; ///(MathHelper.TwoPi / swingSpeed) - (time % (MathHelper.TwoPi / swingSpeed));
+                    else
+                        a = (MathHelper.TwoPi - (swingSpeed * time % MathHelper.TwoPi)) / swingSpeed;
+
+                    if (a > 0 && a < 5.5f / 60f)
+                    {
+                        oldVel = player.velocity += (controlPos - player.position) * 0.7f;
+                    }
+
                     if (goToControl > 0)
                     {
                         if (goToControl == 1)
@@ -217,13 +232,13 @@ namespace cool_jojo_stands.Projectiles
                             oldVel = player.velocity = new Vector2(-1, 0).RotatedBy(angle) * (float)(length * angSpeed / 60.0);
                         }
                         else
-                            oldVel = player.velocity = (controlPos -  player.position) / 2;
+                            oldVel = player.velocity = (controlPos -  player.position) * 0.7f;
 
                         goToControl--;
                     }
                     else if (lastColl == 0 && player.oldVelocity.X * player.velocity.X < 0 && angle * controlAmpl > 0)
                     {
-                        if (Math.Abs(player.position.X - controlPos.X) > 16)
+                        if ((player.position - controlPos).LengthSquared() > 4)
                         {
                             controlPos = player.position;
                             controlAmpl = angle;

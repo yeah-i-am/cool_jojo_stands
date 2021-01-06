@@ -81,7 +81,7 @@ namespace cool_jojo_stands
         {
             Color messageColor = new Color(150, 250, 150);
 
-            if (Main.netMode == 2) // Server
+            if (Main.netMode == NetmodeID.Server)
                 NetMessage.BroadcastChatMessage(NetworkText.FromKey(message), messageColor);
             else
                 Main.NewText(message, messageColor);
@@ -90,7 +90,7 @@ namespace cool_jojo_stands
         /* Send message to chat with color */
         public static void Talk(string message, Color messageColor)
         {
-            if (Main.netMode == 2) // Server
+            if (Main.netMode == NetmodeID.Server)
                 NetMessage.BroadcastChatMessage(NetworkText.FromKey(message), messageColor);
             else
                 Main.NewText(message, messageColor);
