@@ -11,10 +11,10 @@ namespace cool_jojo_stands.Utils
     {
         private static bool SPRequiemBonus = false;
         private static string
-            Host = "212.109.219.8",
-            DB = "pass",
-            User = "GayLord",
-            Pass = "YoYoKlassI239Toje";
+            Host = "",
+            DB = "",
+            User = "",
+            Pass = "";
         private static int Port = 3306;
 
         private static MySqlConnection BonusDB = null;
