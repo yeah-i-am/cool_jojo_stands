@@ -24,19 +24,19 @@ namespace cool_jojo_stands.Buffs
         {
             StandoPlayer StandPlayer = player.GetModPlayer<StandoPlayer>();
 
-            if (!StandPlayer.HaveHierophantGreenStand)
+            if (StandPlayer.Stand != StandType.HierophantGreen)
             {
-                StandPlayer.HaveHierophantGreenStand = true;
+                StandPlayer.Stand = StandType.HierophantGreen;
                 StandPlayer.HaveStand = true;
                 StandPlayer.StandBuffName = "HierophantGreen";
             }
 
-            player.buffTime[buffIndex] = 2390;
+            player.buffTime[buffIndex] = 32767;
         }
 
         public override void ModifyBuffTip(ref string tip, ref int rare)
         {
-            rare = ItemRarityID.Green;
+            rare = ItemRarityID.Expert;
         }
     }
 }

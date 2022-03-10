@@ -10,7 +10,7 @@ namespace cool_jojo_stands.Projectiles.Minions
             try
             {
                 CheckActive();
-                Behavior();
+                Behaviour();
             }
             catch
             {
@@ -20,8 +20,8 @@ namespace cool_jojo_stands.Projectiles.Minions
 
         public abstract void CheckActive();
 
-        public abstract void Behavior();
+        public abstract void Behaviour();
 
-        public virtual void Some() { }
+        public virtual void PostUpdate() { }
     }
 }

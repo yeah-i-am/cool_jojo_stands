@@ -153,7 +153,7 @@ namespace cool_jojo_stands.Projectiles.Minions
             base.ModifyHitNPC(target, ref damage, ref knockback, ref crit, ref hitDirection);
         }
 
-        public override void Some()
+        public override void PostUpdate()
         { }
     }
 }

@@ -10,29 +10,29 @@ namespace cool_jojo_stands.Projectiles.Minions
 {
     public abstract class NearStand : Stand
     {
-        static int[] immune = new int[200];
+        static int[] ImmuneStands = new int[200];
 
         public NearStand()
         {
             viewEnemyDist = 300f;  // View enemy distance (from stand to enemy)
             chasePlayerSpeed = 9f; // Standart chase player speed (normal speed)
-            maxSpeed = 10000f;     // ... i don't use it
-            maxPlayerDist = 400f;  // Max player distance to chase with normal speed
-            inertia = 13f;         // Physycal variable
-            maxDist = 280f;        // Max player distance to attack enemy
-            AttackSpeed = 10;      // Stand attack speed
-            SpeedRedusePower = 0.7f;
+            _maxSpeed = 10000f;     // ... i don't use it
+            _maxPlayerDistance = 400f;  // Max player distance to chase with normal speed
+            _inertia = 13f;         // Physycal variable
+            _maxAgressiveDistance = 280f;        // Max player distance to attack enemy
+            _attackSpeed = 10;      // Stand attack speed
+            _speedReducePower = 0.7f;
         }
 
-        public override void Behavior()
+        public override void Behaviour()
         {
-            BehavourStart();
+            BehaviourStart();
 
-            lastAttack++;
+            _lastAttack++;
 
             ChasePlayer();
 
-            if (pl.StandManualControl)
+            if (_standPlayer.StandManualControl)
                 ManualControlNear();
             else
                 ChaseNPCNear();
@@ -41,12 +41,12 @@ namespace cool_jojo_stands.Projectiles.Minions
             CheckPlayerDist();
 
             SpeedProcessing();
-            BehavourEnd();
+            BehaviourEnd();
 
-            if (pl.StandJotaroSetBonus > 0)
-                AttackSpeed = 20;
+            if (_standPlayer.StandJotaroSetBonus > 0)
+                _attackSpeed = 20;
             else
-                AttackSpeed = 10;
+                _attackSpeed = 10;
 
             CheckDamage();
         }
@@ -68,7 +68,7 @@ namespace cool_jojo_stands.Projectiles.Minions
             target.immune[projectile.owner] = immune[target.whoAmI];
         }*/
 
-        public override void Some()
+        public override void PostUpdate()
         {
         }
     } /* End of 'NearStand' class */

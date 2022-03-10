@@ -24,19 +24,19 @@ namespace cool_jojo_stands.Buffs
         {
             StandoPlayer StandPlayer = player.GetModPlayer<StandoPlayer>();
 
-            if (!StandPlayer.HaveStarPlatinum)
+            if (StandPlayer.Stand != StandType.StarPlatinum)
             {
-                StandPlayer.HaveStarPlatinum = true;
+                StandPlayer.Stand = StandType.StarPlatinum;
                 StandPlayer.HaveStand = true;
                 StandPlayer.StandBuffName = "StarPlatinum";
             }
 
-            player.buffTime[buffIndex] = 2390;
+            player.buffTime[buffIndex] = 32767;
         }
 
         public override void ModifyBuffTip(ref string tip, ref int rare)
         {
-            rare = ItemRarityID.Purple;
+            rare = ItemRarityID.Expert;
         }
     }
 }

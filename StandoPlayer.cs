@@ -18,6 +18,7 @@ using cool_jojo_stands.NPCs;
 using cool_jojo_stands.SpecialAbilities;
 using cool_jojo_stands.Projectiles;
 using cool_jojo_stands.Projectiles.Minions;
+using static cool_jojo_stands.cool_jojo_stands;
 
 namespace cool_jojo_stands
 {
@@ -28,12 +29,8 @@ namespace cool_jojo_stands
     {
         /* Have stand flags */
         public bool HaveStand = false;
-        public bool HaveStarPlatinum = false;
-        public bool HaveMagicianRedStand = false;
-        public bool HaveHarmitPurpleStand = false;
-        public bool HaveHierophantGreenStand = false;
-        public bool HaveSilverChariotStand = false;
-        public bool HaveStarPlatinumRequiem = false;
+        public StandType Stand;
+        public bool DisabledAttackings;
 
         /* Time stop variable */
         public bool InvincibilityInStopTime = false;
@@ -53,7 +50,7 @@ namespace cool_jojo_stands
         public int StandLevel = 1;
         public float StandXP = 0;
         public float StandNeedToUpXP = 3000;
-        public const int MaxStandLevel = 100;
+        public const int MaxStandLevel = 500;
 
         /* Stand control variables */
         public bool StandManualControl = false;
@@ -141,35 +138,26 @@ namespace cool_jojo_stands
                 StandSpawned = false;
             }
 
-            if (HaveStarPlatinum)
+            switch (Stand)
             {
-                player.ClearBuff(ModContent.BuffType<Buffs.StarPlatinumStand>());
-                HaveStarPlatinum = false;
-            }
-            else if (HaveMagicianRedStand)
-            {
-                player.ClearBuff(ModContent.BuffType<Buffs.MagicianRedStand>());
-                HaveMagicianRedStand = false;
-            }
-            else if (HaveHierophantGreenStand)
-            {
-                player.ClearBuff(ModContent.BuffType<Buffs.HierophantGreenStand>());
-                HaveHierophantGreenStand = false;
-            }
-            else if (HaveHarmitPurpleStand)
-            {
-                player.ClearBuff(ModContent.BuffType<Buffs.HermitPurpleStand>());
-                HaveHarmitPurpleStand = false;
-            }
-            else if (HaveStarPlatinumRequiem)
-            {
-                player.ClearBuff(ModContent.BuffType<Buffs.StarPlatinumRequiemStand>());
-                HaveStarPlatinumRequiem = false;
-            }
-            else if (HaveSilverChariotStand)
-            {
-                player.ClearBuff(ModContent.BuffType<Buffs.SilverChariotStand>());
-                HaveSilverChariotStand = false;
+                case StandType.HierophantGreen:
+                    player.ClearBuff(ModContent.BuffType<Buffs.HierophantGreenStand>());
+                    break;
+                case StandType.StarPlatinum:
+                    player.ClearBuff(ModContent.BuffType<Buffs.StarPlatinumStand>());
+                    break;
+                case StandType.HermitPurple:
+                    player.ClearBuff(ModContent.BuffType<Buffs.HermitPurpleStand>());
+                    break;
+                case StandType.MagicianRed:
+                    player.ClearBuff(ModContent.BuffType<Buffs.MagicianRedStand>());
+                    break;
+                case StandType.TheWorld:
+                    player.ClearBuff(ModContent.BuffType<Buffs.TheWorldStand>());
+                    break;
+                case StandType.SilverChariot:
+                    player.ClearBuff(ModContent.BuffType<Buffs.SilverChariotStand>());
+                    break;
             }
         }
 
@@ -198,85 +186,75 @@ namespace cool_jojo_stands
                 StandSpawned = true;
                 StandJustSpawned = true;
 
-                if (HaveStarPlatinum)
-                {
-                    Main.PlaySound(
-                        mod.GetLegacySoundSlot(SoundType.Custom, "Sounds/Custom/Star_Platinum").WithVolume(cool_jojo_stands.summonVolume),
-                        player.Center);
-
-                    StandId = Projectile.NewProjectile(player.position.X + (float)(player.width / 2), player.position.Y + (float)(player.height / 2) + 15,
-                        0f, 0f, mod.ProjectileType("StarPlatinum"), 1, 5f, player.whoAmI, 0f, 0f);
-                }
-                else if (HaveMagicianRedStand)
+                if (Stand != StandType.None)
                 {
                     StandId = Projectile.NewProjectile(player.position.X + (float)(player.width / 2), player.position.Y + (float)(player.height / 2) + 15,
-                        0f, 0f, ModContent.ProjectileType<MagicianRed>(), StandLevel, 2.0f, player.whoAmI, 2f, 0f);
-                }
-                else if (HaveHierophantGreenStand)
-                {
-                    Main.PlaySound(
-                        mod.GetLegacySoundSlot(SoundType.Custom, "Sounds/Custom/Hierophant_Green").WithVolume(cool_jojo_stands.summonVolume),
-                        player.Center);
-
-                    StandId = Projectile.NewProjectile(player.position.X + (float)(player.width / 2), player.position.Y + (float)(player.height / 2),
-                        0, 0, ModContent.ProjectileType<HierophantGreen>(), 1, 2.0f, player.whoAmI, 1.5f, 0f);
-                }
-                else if (HaveHarmitPurpleStand)
-                {
-                    Vector2 Dir = Main.MouseWorld - player.Center;
-                    Dir.Normalize();
-                    Dir *= 24f;
-
-                    StandId = Projectile.NewProjectile(player.position.X + (float)(player.width / 2), player.position.Y + (float)(player.height / 2),
-                        Dir.X, Dir.Y, ModContent.ProjectileType<HermitPurple>(), StandLevel, 2.0f, player.whoAmI, 0f, 0f);
-
-                    StandSpawned = false;
-                }
-                else if (HaveStarPlatinumRequiem)
-                {
-                    Main.PlaySound(
-                        mod.GetLegacySoundSlot(SoundType.Custom, "Sounds/Custom/Star_Platinum").WithVolume(cool_jojo_stands.summonVolume),
-                        player.Center);
-
-                    StandId = Projectile.NewProjectile(player.position.X + (float)(player.width / 2), player.position.Y + (float)(player.height / 2) + 15,
-                        0f, 0f, mod.ProjectileType("StarPlatinumRequiem"), 1, 5f, player.whoAmI, 0f, 0f);
-                }
-                else if (HaveSilverChariotStand)
-                {
-                    Main.PlaySound(
-                        mod.GetLegacySoundSlot(SoundType.Custom, "Sounds/Custom/Silver_Chariot").WithVolume(cool_jojo_stands.summonVolume),
-                        player.Center);
-
-                    StandId = Projectile.NewProjectile(player.position.X + (float)(player.width / 2), player.position.Y + (float)(player.height / 2) + 15,
-                        0f, 0f, ModContent.ProjectileType<SilverChariot>(), 1, 5f, player.whoAmI, 0f, 0f);
+                            0f, 0f, mod.ProjectileType(Stand.ToString()), 1, 5f, player.whoAmI, 0f, 0f);
                 }
             }
             else if (cool_jojo_stands.SwitchStandControlHT.JustPressed)
             {
                 StandManualControl = !StandManualControl;
+                cool_jojo_stands.ManualingPlayers[player.whoAmI] = StandManualControl;
+
+                if (Main.netMode == NetmodeID.MultiplayerClient)
+                {
+                    ModPacket packet = cool_jojo_stands.mod.GetPacket();
+
+                    packet.Write((byte)StandMessageType.StandManual);
+                    packet.Write(player.whoAmI);
+                    packet.Write((bool)ManualingPlayers[player.whoAmI]);
+
+                    packet.Send();
+                }
             }
             else if (cool_jojo_stands.SpecialAbilityHT.JustPressed)
             {
-                //Utils.CutSceneManager.Scenes["Test"].Activate();
-                if ((HaveStarPlatinum && StandLevel >= 40) || (HaveStarPlatinumRequiem && StandLevel >= 10))
+                if (Stand != StandType.None)
+                    cool_jojo_stands.StandAbilities[Stand](player, StandLevel);
+            }
+            if (StandSpawned && StandManualControl && cool_jojo_stands.Stands[Stand] is NearStand)
+            {
+                if (cool_jojo_stands.StandAttack.Old && !AttackingPlayers[player.whoAmI])
                 {
+                    AttackingPlayers[player.whoAmI] = true;
                     if (Main.netMode == NetmodeID.MultiplayerClient)
                     {
                         ModPacket packet = cool_jojo_stands.mod.GetPacket();
 
-                        packet.Write((byte)cool_jojo_stands.StandMessageType.TimeStopActivate);
+                        packet.Write((byte)StandMessageType.StandAttack);
                         packet.Write(player.whoAmI);
+                        packet.Write((bool)AttackingPlayers[player.whoAmI]);
 
                         packet.Send();
                     }
-
-                    Utils.SpecialAbilityManager.Abilities["ZaWardo"].GetAbilty<ZaWardo>().Init(player.whoAmI);
-                    Utils.SpecialAbilityManager.Activate("ZaWardo");
                 }
-                else if (HaveSilverChariotStand)
+                else if (!cool_jojo_stands.StandAttack.Old && AttackingPlayers[player.whoAmI])
                 {
-                    Utils.SpecialAbilityManager.Abilities["SCA"].GetAbilty<SilverChariotAbility>().Init(player.whoAmI);
-                    Utils.SpecialAbilityManager.Activate("SCA");
+                    AttackingPlayers[player.whoAmI] = false;
+                    if (Main.netMode == NetmodeID.MultiplayerClient)
+                    {
+                        ModPacket packet = cool_jojo_stands.mod.GetPacket();
+
+                        packet.Write((byte)StandMessageType.StandAttack);
+                        packet.Write(player.whoAmI);
+                        packet.Write((bool)AttackingPlayers[player.whoAmI]);
+
+                        packet.Send();
+                    }
+                }
+            }
+            else if (cool_jojo_stands.Stands[Stand] is NearStand && AttackingPlayers[player.whoAmI])
+            {
+                AttackingPlayers[player.whoAmI] = false;
+                if (Main.netMode == NetmodeID.MultiplayerClient)
+                {
+                    ModPacket packet = cool_jojo_stands.mod.GetPacket();
+
+                    packet.Write((byte)StandMessageType.StandManual);
+                    packet.Write((bool)AttackingPlayers[player.whoAmI]);
+
+                    packet.Send();
                 }
             }
         }
@@ -379,7 +357,7 @@ namespace cool_jojo_stands
         {
             if (StandBuffName != "")
                 if (!player.HasBuff(mod.BuffType(StandBuffName + "Stand")))
-                    player.AddBuff(mod.BuffType(StandBuffName + "Stand"), 2390);
+                    player.AddBuff(mod.BuffType(StandBuffName + "Stand"), 32767);
         }
 
         /*******************************

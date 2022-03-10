@@ -10,15 +10,15 @@ namespace cool_jojo_stands.Utils
     public abstract class SpecialAbility
     {
         /* Ability parameters */
-        public float AbilityCooldown = 0;
-        public float AbilityTime = 0;
+        public float abilityCooldown = 0;
+        public float abilityTime = 0;
 
-        protected float cooldown = 0;
-        protected float time = 0;
+        protected float _cooldown = 0;
+        protected float _time = 0;
         public string key;
 
-        public bool Activated => time > 0;
-        public bool CanBeUsed => cooldown < 0;
+        public bool Activated => _time > 0;
+        public bool CanBeUsed => _cooldown < 0;
 
         public virtual void Load() { }
         public virtual void ShaderLoad() { }
@@ -32,22 +32,22 @@ namespace cool_jojo_stands.Utils
         /* Abilities time syncronization */
         public void Sync()
         {
-            if (time <= 0)
+            if (_time <= 0)
             {
-                cooldown -= 1f / 60f;
+                _cooldown -= 1f / 60f;
 
                 if (SpecialAbilityManager.ActivedAbilities.Contains(this))
                     DeActivate();
             }
 
-            time -= 1f / 60f;
+            _time -= 1f / 60f;
         } /* End of 'Sync' function */
 
         /* Set ability parameters to start values */
         public void SetUp()
         {
-            time = AbilityTime;
-            cooldown = AbilityCooldown;
+            _time = abilityTime;
+            _cooldown = abilityCooldown;
         } /* Endof 'SetUp' function */
 
         /* Activate ability function */

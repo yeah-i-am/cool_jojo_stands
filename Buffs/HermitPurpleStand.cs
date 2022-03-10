@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Terraria;
 using Terraria.GameInput;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace cool_jojo_stands.Buffs
@@ -22,14 +23,18 @@ namespace cool_jojo_stands.Buffs
         {
             StandoPlayer StandPlayer = player.GetModPlayer<StandoPlayer>();
 
-            if (!StandPlayer.HaveHarmitPurpleStand)
+            if (StandPlayer.Stand != StandType.HermitPurple)
             {
-                StandPlayer.HaveHarmitPurpleStand = true;
+                StandPlayer.Stand = StandType.HermitPurple;
                 StandPlayer.HaveStand = true;
                 StandPlayer.StandBuffName = "HermitPurple";
             }
 
-            player.buffTime[buffIndex] = 2390;
+            player.buffTime[buffIndex] = 32767;
+        }
+        public override void ModifyBuffTip(ref string tip, ref int rare)
+        {
+            rare = ItemRarityID.Expert;
         }
     }
 }

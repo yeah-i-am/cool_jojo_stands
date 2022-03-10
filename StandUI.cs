@@ -14,8 +14,8 @@ namespace cool_jojo_stands
     class StandUI : UIState
     {
         public UIText 
-            lvlNumText = new UIText("239", 0.9f), // Level text field
-            xpNumText = new UIText("239", 0.6f);  // XP text field
+            lvlNumText = new UIText("lvl_num", 0.9f), // Level text field
+            xpNumText = new UIText("xp_num", 0.6f);  // XP text field
 
         /* Separate elements */
         public UIPanel panel = new UIPanel();
@@ -24,7 +24,7 @@ namespace cool_jojo_stands
 
         Texture2D buttonTexture;    // Hide UI button texture
         const float SlideSpeed = 8; // Hide UI speed
-        bool IsHideUI = true;       // UI hided flaq
+        bool hideUI = true;       // UI hided flaq сам такой блять!!!
 
         /* Initialize UI function */
         public override void OnInitialize()
@@ -108,7 +108,7 @@ namespace cool_jojo_stands
             switch (cool_jojo_stands.StandClientConfig.LvlPos)
             {
                 case UIPos.Right:
-                    if (IsHideUI && panel.Left.Pixels < 120)
+                    if (hideUI && panel.Left.Pixels < 120)
                     {
                         float Speed = Math.Min(120f - panel.Left.Pixels, SlideSpeed);
 
@@ -116,7 +116,7 @@ namespace cool_jojo_stands
                         xpProgressBar.Left.Pixels += Speed;
                         hideUiButton.Left.Pixels += Speed;
                     }
-                    else if (!IsHideUI && panel.Left.Pixels > 0)
+                    else if (!hideUI && panel.Left.Pixels > 0)
                     {
                         float Speed = Math.Min(panel.Left.Pixels, SlideSpeed);
 
@@ -127,7 +127,7 @@ namespace cool_jojo_stands
                     break;
 
                 case UIPos.Left:
-                    if (IsHideUI && panel.Left.Pixels > -120)
+                    if (hideUI && panel.Left.Pixels > -120)
                     {
                         float Speed = Math.Min(120f + panel.Left.Pixels, SlideSpeed);
 
@@ -135,7 +135,7 @@ namespace cool_jojo_stands
                         xpProgressBar.Left.Pixels -= Speed;
                         hideUiButton.Left.Pixels -= Speed;
                     }
-                    else if (!IsHideUI && panel.Left.Pixels < 0)
+                    else if (!hideUI && panel.Left.Pixels < 0)
                     {
                         float Speed = Math.Min(-panel.Left.Pixels, SlideSpeed);
 
@@ -146,7 +146,7 @@ namespace cool_jojo_stands
                     break;
 
                 case UIPos.Top:
-                    if (IsHideUI && panel.Top.Pixels > -75)
+                    if (hideUI && panel.Top.Pixels > -75)
                     {
                         float Speed = Math.Min(75f + panel.Top.Pixels, SlideSpeed);
 
@@ -154,7 +154,7 @@ namespace cool_jojo_stands
                         xpProgressBar.Top.Pixels -= Speed;
                         hideUiButton.Top.Pixels -= Speed;
                     }
-                    else if (!IsHideUI && panel.Top.Pixels < 0)
+                    else if (!hideUI && panel.Top.Pixels < 0)
                     {
                         float Speed = Math.Min(-panel.Top.Pixels, SlideSpeed);
 
@@ -165,7 +165,7 @@ namespace cool_jojo_stands
                     break;
 
                 case UIPos.Bottom:
-                    if (IsHideUI && panel.Top.Pixels < 75)
+                    if (hideUI && panel.Top.Pixels < 75)
                     {
                         float Speed = Math.Min(75f - panel.Top.Pixels, SlideSpeed);
 
@@ -173,7 +173,7 @@ namespace cool_jojo_stands
                         xpProgressBar.Top.Pixels += Speed;
                         hideUiButton.Top.Pixels += Speed;
                     }
-                    else if (!IsHideUI && panel.Top.Pixels > 0)
+                    else if (!hideUI && panel.Top.Pixels > 0)
                     {
                         float Speed = Math.Min(panel.Top.Pixels, SlideSpeed);
 
@@ -189,7 +189,7 @@ namespace cool_jojo_stands
         /* Processing hide UI button click function */
         private void OnButtonClick(UIMouseEvent evt, UIElement listeningElement)
         {
-            IsHideUI = !IsHideUI;
+            hideUI = !hideUI;
         }
 
         /* Create a texture for hide UI button function */

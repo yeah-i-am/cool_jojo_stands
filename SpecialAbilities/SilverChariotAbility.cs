@@ -17,32 +17,33 @@ namespace cool_jojo_stands.SpecialAbilities
 {
     public class SilverChariotAbility : SpecialAbility
     {
-        public int whoAmI;
-        int ghostNum;
+        public int User { get; private set; }
+
+        int _ghostNum;
 
         public SilverChariotAbility()
         {
-            AbilityCooldown = 1;
-            AbilityTime = 1;
+            abilityCooldown = 1;
+            abilityTime = 1;
         }
 
         public void Init( int WhoAmI )
         {
-            whoAmI = WhoAmI;
+            User = WhoAmI;
 
-            StandoPlayer pl = Main.player[whoAmI].GetModPlayer<StandoPlayer>();
+            StandoPlayer pl = Main.player[User].GetModPlayer<StandoPlayer>();
 
-            ghostNum = (pl.StandLevel - 10) / 10;
+            _ghostNum = (pl.StandLevel - 10) / 10;
         }
 
         public override void Start()
         {
-            StandoPlayer pl = Main.player[whoAmI].GetModPlayer<StandoPlayer>();
+            StandoPlayer pl = Main.player[User].GetModPlayer<StandoPlayer>();
 
             if (pl.StandId == -1)
             {
-                time = 0;
-                cooldown = 0;
+                _time = 0;
+                _cooldown = 0;
                 return;
             }
 

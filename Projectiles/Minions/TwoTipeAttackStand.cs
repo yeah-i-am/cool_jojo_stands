@@ -26,7 +26,7 @@ namespace cool_jojo_stands.Projectiles.Minions
         {
         }
 
-        public override void Behavior()
+        public override void Behaviour()
         {
             Player player = Main.player[projectile.owner];
             const float PlayerStayDist = 40f;

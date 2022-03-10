@@ -9,9 +9,9 @@ namespace cool_jojo_stands.Items
 {
     class TarotCards : ModItem
     {
-        string[] stands =
+        public string[] stands =
         {
-          "StarPlatinumStand", "MagicianRedStand", "HierophantGreenStand"///, "HermitPurpleStand"
+            "HermitPurple", "HierophantGreen", "MagicianRed", "StarPlatinum" , "TheWorld"
         };
 
         public override void SetStaticDefaults()
@@ -59,26 +59,17 @@ namespace cool_jojo_stands.Items
 
             Terraria.Utilities.UnifiedRandom rand = Main.rand;
 
-            if (rand.Next(1000) == 239 && !player.HasBuff(ModContent.BuffType<Buffs.StarPlatinumRequiemStand>()))
-            {
-                pl.DeleteStand();
-                player.AddBuff(ModContent.BuffType<Buffs.StarPlatinumRequiemStand>(), 239);
+            int k = rand.Next(stands.Length);
 
-                return true;
-            }
-            else
-            {
-                int k = rand.Next(stands.Length);
+            while (player.HasBuff(mod.BuffType(stands[k] + "Stand")))
+                k = rand.Next(stands.Length);
 
-                while (player.HasBuff(mod.BuffType(stands[k])))
-                    k = rand.Next(stands.Length);
+            pl.DeleteStand();
+            pl.StandBuffName = stands[k];
+            pl.Stand = (StandType)Enum.Parse(typeof(StandType), stands[k]);
+            player.AddBuff(mod.BuffType(stands[k] + "Stand"), 32767);
 
-                pl.DeleteStand();
-
-                player.AddBuff(mod.BuffType(stands[k]), 239);
-
-                return true;
-            }
+            return true;
         }
     }
 }

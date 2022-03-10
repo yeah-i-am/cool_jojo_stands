@@ -8,17 +8,17 @@ namespace cool_jojo_stands.Projectiles.Minions
 {
     public class HierophantGreen : Stand
     {
-        protected int   TypeOfAttack = 0;
+        protected int _attackType = 0;
 
         public HierophantGreen()
         {
             viewEnemyDist = 900f;  // View enemy distance (from stand to enemy)
             chasePlayerSpeed = 6f; // Standart chase player speed (normal speed)
-            maxSpeed = 10000f;     // ... i don't use it
-            maxPlayerDist = 330f;  // Max player distance to chase with normal speed
-            inertia = 20f;         // Physycal variable
-            maxDist = 300f;        // Max player distance to attack enemy
-            ShootVel = 14f;        // Stand shoot velocity
+            _maxSpeed = 10000f;     // ... i don't use it
+            _maxPlayerDistance = 330f;  // Max player distance to chase with normal speed
+            _inertia = 20f;         // Physycal variable
+            _maxAgressiveDistance = 300f;        // Max player distance to attack enemy
+            shootVelocity = 14f;        // Stand shoot velocity
             stayPlayerDist = new Vector2(30, 20);
         }
 
@@ -41,7 +41,7 @@ namespace cool_jojo_stands.Projectiles.Minions
             projectile.ignoreWater = true;
             projectile.alpha = 255;
 
-            Shoot = ModContent.ProjectileType<EmeraldBlast>();
+            shootId = ModContent.ProjectileType<EmeraldBlast>();
         }
 
         public override void SelectFrame()
@@ -53,13 +53,13 @@ namespace cool_jojo_stands.Projectiles.Minions
             StandoPlayer pl = player.GetModPlayer<StandoPlayer>();
 
             if (pl.StandKakyoinSetBonus == 1)
-                TypeOfAttack = 1;
+                _attackType = 1;
             else
-                TypeOfAttack = 0;
+                _attackType = 0;
 
             projectile.frameCounter++;
 
-            if (attacking)
+            if (_attacking)
             {
                 if (AttackTime > 0.01f)
                 {
@@ -94,16 +94,16 @@ namespace cool_jojo_stands.Projectiles.Minions
             Lighting.AddLight(projectile.Center, 0f, 0.7f, 0f);
         }
 
-        public override void Behavior()
+        public override void Behaviour()
         {
-            BehavourStart();
+            BehaviourStart();
 
             ReloadTime -= 1 / 60f;
             AttackTime -= 1 / 60f;
 
             ChasePlayer();
 
-            if (pl.StandManualControl)
+            if (_standPlayer.StandManualControl)
                 ManualControlFar();
             else
                 ChaseNPCFar();
@@ -111,19 +111,19 @@ namespace cool_jojo_stands.Projectiles.Minions
             TargetProcessingFar();
             CheckPlayerDist();
 
-            if (attacking && AttackTime > 0 && AttackTime % (1f / 20f) < 1f / 60f)
+            if (_attacking && AttackTime > 0 && AttackTime % (1f / 20f) < 1f / 60f)
             {
                 Vector2 ShootPos = projectile.Center + new Vector2(Main.rand.Next(-10, 10), Main.rand.Next(-10, 10)) / 10f;
-                Vector2 D = targetPos - ShootPos;
+                Vector2 D = _targetPosition - ShootPos;
                 D.Normalize();
 
-                Vector2 ShootV = D * ShootVel;
+                Vector2 ShootV = D * shootVelocity;
 
-                Projectile.NewProjectile(ShootPos.X, ShootPos.Y, ShootV.X, ShootV.Y, Shoot, projectile.damage, projectile.knockBack, projectile.owner, 0f, 0f);
+                Projectile.NewProjectile(ShootPos.X, ShootPos.Y, ShootV.X, ShootV.Y, shootId, projectile.damage, projectile.knockBack, projectile.owner, 0f, 0f);
             }
 
             SpeedProcessing();
-            BehavourEnd();
+            BehaviourEnd();
         }
 
         public override void Kill(int timeLeft)

@@ -15,15 +15,24 @@ using cool_jojo_stands.SpecialAbilities;
 using cool_jojo_stands.Utils;
 using System.IO;
 using System;
+using cool_jojo_stands.Projectiles.Minions;
+using cool_jojo_stands.Projectiles;
+using cool_jojo_stands.Buffs;
 
 namespace cool_jojo_stands
 {
     class cool_jojo_stands : Mod
     {
-        public static ModHotKey StandSummonHT, SpecialAbilityHT, SwitchStandControlHT; // Hotkeys
+        public static ModHotKey StandSummonHT, StandAttack, SpecialAbilityHT, SwitchStandControlHT; // Hotkeys
+        public static Dictionary<StandType, ModProjectile> Stands;
+        public static Dictionary<StandType, ModBuff> StandBuffs;
+        public static Dictionary<StandType, StandAbilityDelegate> StandAbilities;
         public static Mod mod; // This mod class
         public static float summonVolume; // Stand summon sound volume
         public static float standBulletVolume; // Stand bullets summon volume
+        public static bool[] AttackingPlayers;
+        public static bool[] ManualingPlayers;
+        public static Vector2[] StandsPositions;
 
         /* Interface variables */
         private UserInterface StandInterface;
@@ -80,10 +89,64 @@ namespace cool_jojo_stands
             StandSummonHT = RegisterHotKey("Summon Stand", "Insert");
             SpecialAbilityHT = RegisterHotKey("Special ability", "P");
             SwitchStandControlHT = RegisterHotKey("Switch stand control mode", "Home");
+            StandAttack = RegisterHotKey("Attack by Stand", "Mouse1");
+            
+            AttackingPlayers = new bool[256];
+            ManualingPlayers = new bool[256];
+            StandsPositions = new Vector2[256];
+
+            Stands = new Dictionary<StandType, ModProjectile>()
+            {
+                { StandType.HierophantGreen, new HierophantGreen() },
+                { StandType.SilverChariot, new SilverChariot() },
+                { StandType.HermitPurple, new HermitPurple() },
+                { StandType.StarPlatinum, new StarPlatinum() },
+                { StandType.MagicianRed, new MagicianRed() },
+                { StandType.TheWorld, new Projectiles.Minions.TheWorld() }
+            };
+            StandBuffs = new Dictionary<StandType, ModBuff>()
+            {
+                { StandType.HierophantGreen, new HierophantGreenStand() },
+                { StandType.SilverChariot, new SilverChariotStand() },
+                { StandType.HermitPurple, new HermitPurpleStand() },
+                { StandType.StarPlatinum, new StarPlatinumStand() },
+                { StandType.MagicianRed, new MagicianRedStand() },
+                { StandType.TheWorld, new Buffs.TheWorldStand() }
+            };
+
+            StandAbilityDelegate zaWardoAbility = (Player player, int standLevel) =>
+            {
+                if (standLevel < 20) return;
+
+                if (Main.netMode == NetmodeID.MultiplayerClient)
+                {
+                    ModPacket packet = GetPacket();
+
+                    packet.Write((byte)StandMessageType.TimeStopActivate);
+                    packet.Write(player.whoAmI);
+
+                    packet.Send();
+                }
+
+                Utils.SpecialAbilityManager.Abilities["ZaWardo"].GetAbilty<ZaWardoAbility>().Init(player.whoAmI);
+                Utils.SpecialAbilityManager.Activate("ZaWardo");
+            };
+            StandAbilityDelegate silverChariotGhostAbility = (Player player, int standLevel) =>
+            {
+                Utils.SpecialAbilityManager.Abilities["SCA"].GetAbilty<SilverChariotAbility>().Init(player.whoAmI);
+                Utils.SpecialAbilityManager.Activate("SCA");
+            };
+
+            StandAbilities = new Dictionary<StandType, StandAbilityDelegate>()
+            {
+                { StandType.TheWorld, zaWardoAbility },
+                { StandType.StarPlatinum, zaWardoAbility },
+                { StandType.SilverChariot, silverChariotGhostAbility }
+            };
 
             /* Loading special abilities */
             SpecialAbilityManager.Load();
-            SpecialAbilityManager.AddAbility("ZaWardo", new ZaWardo());
+            SpecialAbilityManager.AddAbility("ZaWardo", new ZaWardoAbility());
             SpecialAbilityManager.AddAbility("SCA", new SilverChariotAbility());
 
             /* Client only loading */
@@ -205,6 +268,7 @@ namespace cool_jojo_stands
             SpecialAbilityHT = null;
             StandClientConfig = null;
             SwitchStandControlHT = null;
+            StandAttack = null;
 
             SpecialAbilityManager.UnLoad();
         }
@@ -220,7 +284,7 @@ namespace cool_jojo_stands
 
         internal enum StandMessageType : byte
         {
-            SyncNPCFromStatue, TimeStopActivate
+            SyncNPCFromStatue, TimeStopActivate, StandManual, StandAttack, StandPosition
         }
 
         public override void HandlePacket(BinaryReader reader, int whoAmI)
@@ -270,8 +334,61 @@ namespace cool_jojo_stands
                         packet.Send(-1, fromWho);
                     }
 
-                    SpecialAbilityManager.Abilities["ZaWardo"].GetAbilty<ZaWardo>().Init(fromWho);
+                    SpecialAbilityManager.Abilities["ZaWardo"].GetAbilty<ZaWardoAbility>().Init(fromWho);
                     SpecialAbilityManager.Activate("ZaWardo");
+                    break;
+
+                case StandMessageType.StandManual:
+                    int fromWho2 = reader.ReadInt32();
+                    bool manualing = reader.ReadBoolean();
+                    ManualingPlayers[fromWho2] = manualing;
+
+                    if (Main.netMode == NetmodeID.Server)
+                    {
+                        ModPacket packet = mod.GetPacket();
+
+                        packet.Write((byte)StandMessageType.StandManual);
+                        packet.Write(fromWho2);
+                        packet.Write(manualing);
+
+                        packet.Send(-1, fromWho2);
+                    }
+                    break;
+
+                case StandMessageType.StandAttack:
+                    int fromWho3 = reader.ReadInt32();
+                    bool attacking = reader.ReadBoolean();
+                    AttackingPlayers[fromWho3] = attacking;
+
+                    if (Main.netMode == NetmodeID.Server)
+                    {
+                        ModPacket packet = mod.GetPacket();
+
+                        packet.Write((byte)StandMessageType.StandAttack);
+                        packet.Write(fromWho3);
+                        packet.Write(attacking);
+
+                        packet.Send(-1, fromWho3);
+                    }
+                    break;
+
+                case StandMessageType.StandPosition:
+                    int fromWho4 = reader.ReadInt32();
+                    float x = reader.ReadSingle();
+                    float y = reader.ReadSingle();
+                    StandsPositions[fromWho4] = new Vector2(x, y);
+
+                    if (Main.netMode == NetmodeID.Server)
+                    {
+                        ModPacket packet = mod.GetPacket();
+
+                        packet.Write((byte)StandMessageType.StandPosition);
+                        packet.Write(fromWho4);
+                        packet.Write(x);
+                        packet.Write(y);
+
+                        packet.Send(-1, fromWho4);
+                    }
                     break;
             }
         }

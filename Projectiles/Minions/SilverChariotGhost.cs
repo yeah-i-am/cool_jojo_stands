@@ -11,43 +11,43 @@ namespace cool_jojo_stands.Projectiles.Minions
 {
     public class SilverChariotGhost : Stand
     {
-        static int[] targets = new int[10];
+        static int[] _targets = new int[10];
         //int id;
 
-        Vector2[] armShift = new Vector2[10];
-        float[] armPhase = new float[10];
+        Vector2[] _armShift = new Vector2[10];
+        float[] _armPhase = new float[10];
         float
-            armSpeed = 35f,
-            armLenght = 20f;
+            _armSpeed = 35f,
+            _armLength = 20f;
 
         public SilverChariotGhost()
         {
             viewEnemyDist = 300f;  // View enemy distance (from stand to enemy)
             chasePlayerSpeed = 6f; // Standart chase player speed (normal speed)
-            maxSpeed = 10000f;     // ... i don't use it
-            maxPlayerDist = 400f;  // Max player distance to chase with normal speed
-            inertia = 20f;         // Physycal variable
-            maxDist = 380f;        // Max player distance to attack enemy
-            AttackSpeed = 10;      // Stand attack speed
+            _maxSpeed = 10000f;     // ... i don't use it
+            _maxPlayerDistance = 400f;  // Max player distance to chase with normal speed
+            _inertia = 20f;         // Physycal variable
+            _maxAgressiveDistance = 380f;        // Max player distance to attack enemy
+            _attackSpeed = 10;      // Stand attack speed
 
             if (Main.rand != null)
                 for (int i = 0; i < 10; i++)
                 {
-                    armPhase[i] = Main.rand.NextFloat(MathHelper.TwoPi);
-                    armShift[i] = new Vector2(Main.rand.NextFloat(-15f, 5f), Main.rand.NextFloat(-15f, 15f));
-                    targets[i] = -1;
+                    _armPhase[i] = Main.rand.NextFloat(MathHelper.TwoPi);
+                    _armShift[i] = new Vector2(Main.rand.NextFloat(-15f, 5f), Main.rand.NextFloat(-15f, 15f));
+                    _targets[i] = -1;
                 }
         }
 
-        public override void Behavior()
+        public override void Behaviour()
         {
-            BehavourStart();
+            BehaviourStart();
 
-            lastAttack++;
+            _lastAttack++;
 
             ChasePlayer();
 
-            if (pl.StandManualControl)
+            if (_standPlayer.StandManualControl)
                 ManualControlNear();
             else
                 ChaseNPCNear();
@@ -56,12 +56,12 @@ namespace cool_jojo_stands.Projectiles.Minions
             CheckPlayerDist();
 
             SpeedProcessing();
-            BehavourEnd();
+            BehaviourEnd();
 
-            if (pl.StandPornoleffSetBonus > 0)
-                AttackSpeed = 20;
+            if (_standPlayer.StandPornoleffSetBonus > 0)
+                _attackSpeed = 20;
             else
-                AttackSpeed = 10;
+                _attackSpeed = 10;
 
             CheckDamage();
         }
@@ -101,7 +101,7 @@ namespace cool_jojo_stands.Projectiles.Minions
 
             projectile.frameCounter++;
 
-            if (attacking)
+            if (_attacking)
             {
                 if (pl.StandJotaroSetBonus > 0)
                 {
@@ -128,10 +128,10 @@ namespace cool_jojo_stands.Projectiles.Minions
         /* Predraw function */
         public override bool PreDraw(SpriteBatch spriteBatch, Color lightColor)
         {
-            if (pl.StandPornoleffSetBonus == 0 && !attacking && false)
+            if (_standPlayer.StandPornoleffSetBonus == 0 && !_attacking && false)
                 return true;
 
-            Vector2 direction = targetPos - projectile.position;
+            Vector2 direction = _targetPosition - projectile.position;
             direction.Normalize();
 
             //////////////////
@@ -146,39 +146,39 @@ namespace cool_jojo_stands.Projectiles.Minions
 
             for (int i = 0; i < 10; i++)
             {
-                float si = (float)Math.Sin(armPhase[i]);
+                float si = (float)Math.Sin(_armPhase[i]);
 
                 if (si < -0.9)
                 {
-                    armShift[i] = new Vector2(Main.rand.NextFloat(-15f, 5f), Main.rand.NextFloat(-15f, 15f));
-                    armPhase[i] -= Main.rand.NextFloat(0f, 0.8f) * armSpeed / 60f;
+                    _armShift[i] = new Vector2(Main.rand.NextFloat(-15f, 5f), Main.rand.NextFloat(-15f, 15f));
+                    _armPhase[i] -= Main.rand.NextFloat(0f, 0.8f) * _armSpeed / 60f;
                 }
 
                 float[] oldPhase = new float[3] {
-                    armPhase[i] - armSpeed / 180f,
-                    armPhase[i] - armSpeed / 120f,
-                    armPhase[i] - armSpeed / 60f
+                    _armPhase[i] - _armSpeed / 180f,
+                    _armPhase[i] - _armSpeed / 120f,
+                    _armPhase[i] - _armSpeed / 60f
                 };
 
                 Vector2[] oldPos = new Vector2[3];
 
-                armPhase[i] += armSpeed / 60f;
+                _armPhase[i] += _armSpeed / 60f;
 
                 if (projectile.spriteDirection == -1)
                 {
-                    position = projectile.Center + armShift[i] - armLenght * direction * si;
+                    position = projectile.Center + _armShift[i] - _armLength * direction * si;
                     for (int l = 0; l < 3; l++)
-                        oldPos[l] = projectile.Center - armLenght * direction * (float)Math.Sin(oldPhase[l]);
+                        oldPos[l] = projectile.Center - _armLength * direction * (float)Math.Sin(oldPhase[l]);
                     ///rotation = attackAngle - (float)Math.PI * Math.Sign(attackAngle);
                     ///rotation = (rotation > invMaxAttackAngle) ? invMaxAttackAngle :
                     ///((rotation < invMinAttackAngle) ? invMinAttackAngle : rotation);
                 }
                 else
                 {
-                    position = projectile.Center + armShift[i] + armLenght * direction * si - new Vector2(armLenght * 0.8f, 0);
+                    position = projectile.Center + _armShift[i] + _armLength * direction * si - new Vector2(_armLength * 0.8f, 0);
 
                     for (int l = 0; l < 3; l++)
-                        oldPos[l] = projectile.Center + armShift[i] + armLenght * direction * (float)Math.Sin(oldPhase[l]) - new Vector2(armLenght * 0.8f, 0);
+                        oldPos[l] = projectile.Center + _armShift[i] + _armLength * direction * (float)Math.Sin(oldPhase[l]) - new Vector2(_armLength * 0.8f, 0);
                     ///rotation = (attackAngle > maxAttackAngle) ? maxAttackAngle :
                     ///((attackAngle < minAttackAngle) ? minAttackAngle : attackAngle);
 

@@ -8,9 +8,9 @@ namespace cool_jojo_stands.Items
 {
     public class stand_arrow : ModItem
     {
-        string[] stands =
+        public string[] stands =
         {
-          "StarPlatinumStand", "MagicianRedStand", "HierophantGreenStand"///, "SilverChariotStand"///, "HermitPurpleStand"
+            "HermitPurple", "HierophantGreen", "MagicianRed", "StarPlatinum" , "TheWorld"
         };
 
         public override void SetStaticDefaults()
@@ -39,52 +39,8 @@ namespace cool_jojo_stands.Items
             if (player.GetModPlayer<StandoPlayer>().HaveStand)
                 return true;
 
-            switch (player.name)
-            {
-                case "Avdol":
-                case "avdol":
-                    player.AddBuff(ModContent.BuffType<Buffs.MagicianRedStand>(), 239);
-                    return true;
-
-                case "Jotaro":
-                case "jotaro":
-                    player.AddBuff(ModContent.BuffType<Buffs.StarPlatinumStand>(), 239);
-                    return true;
-
-                case "Joseph":
-                case "joseph":
-                    player.AddBuff(ModContent.BuffType<Buffs.HermitPurpleStand>(), 239);
-                    return true;
-
-                case "Kakyoin":
-                case "kakyoin":
-                    player.AddBuff(ModContent.BuffType<Buffs.HierophantGreenStand>(), 239);
-                    return true;
-
-                ///case "Froloh":
-                ///case "froloh":
-                ///    player.AddBuff(ModContent.BuffType<Buffs.StarPlatinumRequiemStand>(), 239);
-                ///    return true;
-
-                case "Pornoleff":
-                case "Polnoreff":
-                case "Polnoref":
-                case "polnoreff":
-                case "polnoref":
-                    player.AddBuff(ModContent.BuffType<Buffs.SilverChariotStand>(), 239);
-                    return true;
-            }
-
-            Terraria.Utilities.UnifiedRandom rand = Main.rand;
-
-            if (rand.Next(1000) == 239)
-                player.AddBuff(ModContent.BuffType<Buffs.StarPlatinumRequiemStand>(), 239);
-            else
-            {
-                player.Hurt(Terraria.DataStructures.PlayerDeathReason.ByCustomReason(player.name + " died because was stupid"), 99, 1);
-                player.AddBuff(mod.BuffType(stands[rand.Next(stands.Length)]), 239);
-            }
-            /// add cut scene
+            player.Hurt(Terraria.DataStructures.PlayerDeathReason.ByCustomReason(player.name + " died by stand arrow"), 99, 1);
+            player.AddBuff(mod.BuffType(stands[new Random().Next(stands.Length)]), 239);
 
             return true;
         }

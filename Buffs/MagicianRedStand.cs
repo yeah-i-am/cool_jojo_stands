@@ -22,19 +22,19 @@ namespace cool_jojo_stands.Buffs
         {
             StandoPlayer StandPlayer = player.GetModPlayer<StandoPlayer>();
 
-            if (!StandPlayer.HaveMagicianRedStand)
+            if (StandPlayer.Stand != StandType.SilverChariot)
             {
-                StandPlayer.HaveMagicianRedStand = true;
+                StandPlayer.Stand = StandType.SilverChariot;
                 StandPlayer.HaveStand = true;
                 StandPlayer.StandBuffName = "MagicianRed";
             }
 
-            player.buffTime[buffIndex] = 2390;
+            player.buffTime[buffIndex] = 32767;
         }
 
         public override void ModifyBuffTip(ref string tip, ref int rare)
         {
-            rare = ItemRarityID.Red;
+            rare = ItemRarityID.Expert;
         }
     }
 }
