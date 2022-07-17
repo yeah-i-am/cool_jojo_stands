@@ -37,13 +37,13 @@ namespace cool_jojo_stands.CutScenes
                     .UseColor(0.2f, 0f, 1f); // HAlign, black, need draw flag
             }
 
-            OldTime = Main.GlobalTime;
+            OldTime = Main.GlobalTimeWrappedHourly;
         }
 
         public override void Update()
         {
-            float dt = Main.GlobalTime - OldTime;
-            OldTime = Main.GlobalTime;
+            float dt = Main.GlobalTimeWrappedHourly - OldTime;
+            OldTime = Main.GlobalTimeWrappedHourly;
 
             progress += 1 / 60f;
 

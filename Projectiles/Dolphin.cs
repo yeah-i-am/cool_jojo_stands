@@ -1,10 +1,12 @@
 ﻿using System;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.Graphics.Shaders;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using cool_jojo_stands.Sounds.Custom;
 
 namespace cool_jojo_stands.Projectiles
 {
@@ -20,21 +22,21 @@ namespace cool_jojo_stands.Projectiles
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Dolphin");
-            Main.projFrames[projectile.type] = 4;
+            Main.projFrames[Projectile.type] = 4;
         }
 
         public override void SetDefaults()
         {
-            projectile.width = 40;
-            projectile.height = 30;
-            projectile.alpha = 0;
-            projectile.timeLeft = 600;
-            projectile.penetrate = 1;
-            projectile.hostile = true;
-            projectile.ranged = true;
-            projectile.tileCollide = false;
-            projectile.ignoreWater = true;
-            projectile.netUpdate = true;
+            Projectile.width = 40;
+            Projectile.height = 30;
+            Projectile.alpha = 0;
+            Projectile.timeLeft = 600;
+            Projectile.penetrate = 1;
+            Projectile.hostile = true;
+            Projectile.DamageType = DamageClass.Ranged;
+            Projectile.tileCollide = false;
+            Projectile.ignoreWater = true;
+            Projectile.netUpdate = true;
         }
 
         public override bool? CanCutTiles() => true;
@@ -45,19 +47,19 @@ namespace cool_jojo_stands.Projectiles
         /* AI function */
         public override void AI()
         {
-            type = (int)projectile.ai[1];
+            type = (int)Projectile.ai[1];
 
-            if (projectile.localAI[1] == 0)
+            if (Projectile.localAI[1] == 0)
             {
-                Main.PlaySound(
-                    mod.GetLegacySoundSlot(SoundType.Custom, "Sounds/Custom/DolphinSound").WithVolume(cool_jojo_stands.standBulletVolume),
-                    projectile.Center);
-                projectile.localAI[1] = 239;
+                SoundEngine.PlaySound(
+                    DolphinSound.GetInstance("cool_jojo_stands/Sounds/Custom/DolphinSound", StandModSystem.standBulletVolume),
+                    Projectile.Center);
+                Projectile.localAI[1] = 239;
             }
 
-            if (projectile.localAI[0] == 0f && type == 0)
+            if (Projectile.localAI[0] == 0f && type == 0)
             {
-                projectile.oldVelocity = projectile.velocity;
+                Projectile.oldVelocity = Projectile.velocity;
 
                 float distance = float.MaxValue, newDist;
 
@@ -66,7 +68,7 @@ namespace cool_jojo_stands.Projectiles
                     NPC npc = Main.npc[k];
 
                     if (npc.CanBeChasedBy(this, false) &&
-                        (newDist = Vector2.DistanceSquared(projectile.Center, npc.Center)) < distance)
+                        (newDist = Vector2.DistanceSquared(Projectile.Center, npc.Center)) < distance)
                     {
                         distance = newDist;
                         target = npc;
@@ -74,29 +76,29 @@ namespace cool_jojo_stands.Projectiles
                 }
 
                 if (target != null)
-                    projectile.localAI[0] = 1f;
+                    Projectile.localAI[0] = 1f;
 
             }
 
-            if (projectile.ai[0] != 1)
+            if (Projectile.ai[0] != 1)
             {
                 CreateDust();
-                projectile.ai[0] = 1;
+                Projectile.ai[0] = 1;
             }
             else
-                projectile.ai[0] = 0;
+                Projectile.ai[0] = 0;
 
-            if (projectile.localAI[0] == 1f && type == 0)
+            if (Projectile.localAI[0] == 1f && type == 0)
             {
                   if (!target.active)
                   {
                       target = null;
-                      projectile.localAI[0] = 0f;
+                      Projectile.localAI[0] = 0f;
                       return;
                   }
 
-                  Vector2 dir = target.Center - projectile.Center;
-                  Vector2 vel = projectile.oldVelocity;
+                  Vector2 dir = target.Center - Projectile.Center;
+                  Vector2 vel = Projectile.oldVelocity;
 
                 vel.Normalize();
 
@@ -107,24 +109,24 @@ namespace cool_jojo_stands.Projectiles
                   newVel.Normalize();
 
                 if (newVel.X < 0)
-                    projectile.spriteDirection = -1;
+                    Projectile.spriteDirection = -1;
                 else
-                    projectile.spriteDirection = 1;
+                    Projectile.spriteDirection = 1;
 
-                  projectile.rotation = MathHelper.PiOver2 * -(projectile.direction - 1) +
+                  Projectile.rotation = MathHelper.PiOver2 * -(Projectile.direction - 1) +
                     MathHelper.PiOver2 - (float)Math.Atan2(newVel.X, newVel.Y);
 
-                  projectile.velocity = newVel * Speed;
+                  Projectile.velocity = newVel * Speed;
             }
             else if (type == 1)
             {
-                if (projectile.velocity.X < 0)
-                    projectile.spriteDirection = -1;
+                if (Projectile.velocity.X < 0)
+                    Projectile.spriteDirection = -1;
                 else
-                    projectile.spriteDirection = 1;
+                    Projectile.spriteDirection = 1;
 
-                projectile.rotation = MathHelper.PiOver2 * -(projectile.direction - 1) +
-                    MathHelper.PiOver2 - (float)Math.Atan2(projectile.velocity.X, projectile.velocity.Y);
+                Projectile.rotation = MathHelper.PiOver2 * -(Projectile.direction - 1) +
+                    MathHelper.PiOver2 - (float)Math.Atan2(Projectile.velocity.X, Projectile.velocity.Y);
             }
 
             SelectFrame();
@@ -145,16 +147,16 @@ namespace cool_jojo_stands.Projectiles
 
         public void SelectFrame()
         {
-            projectile.frameCounter++;
+            Projectile.frameCounter++;
 
-            if (projectile.frameCounter > 5)
+            if (Projectile.frameCounter > 5)
             {
-                projectile.frame = (projectile.frame + 1) % 4;
-                projectile.frameCounter = 0;
+                Projectile.frame = (Projectile.frame + 1) % 4;
+                Projectile.frameCounter = 0;
             }
         }
 
-        public override bool PreDraw(SpriteBatch spriteBatch, Color lightColor)
+        public override bool PreDraw(ref Color lightColor)
         {
             if (type == 1)
             {
@@ -170,7 +172,7 @@ namespace cool_jojo_stands.Projectiles
             return true;
         }
 
-        public override void PostDraw(SpriteBatch spriteBatch, Color lightColor)
+        public override void PostDraw(Color lightColor)
         {
             if (type == 1)
             {
@@ -182,32 +184,32 @@ namespace cool_jojo_stands.Projectiles
         /* NPC hit function */
         public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
-            if (projectile.penetrate < 1)
+            if (Projectile.penetrate < 1)
             {
-                projectile.Kill();
+                Projectile.Kill();
                 return;
             }
 
-            if (type == 1 && projectile.alpha != 255)
+            if (type == 1 && Projectile.alpha != 255)
             {
-                projectile.alpha = 255;
-                projectile.position = projectile.Center;
-                projectile.width = 150;
-                projectile.height = 150;
-                projectile.Center = projectile.position;
-                projectile.damage *= 2;
-                projectile.knockBack *= 2f;
-                projectile.timeLeft = 4;
-                projectile.velocity = Vector2.Zero;
-                projectile.penetrate = 100;
+                Projectile.alpha = 255;
+                Projectile.position = Projectile.Center;
+                Projectile.width = 150;
+                Projectile.height = 150;
+                Projectile.Center = Projectile.position;
+                Projectile.damage *= 2;
+                Projectile.knockBack *= 2f;
+                Projectile.timeLeft = 4;
+                Projectile.velocity = Vector2.Zero;
+                Projectile.penetrate = 100;
 
                 damage *= 2;
                 knockback *= 2f;
             }
             else
-                projectile.penetrate--;
+                Projectile.penetrate--;
 
-            Player player = Main.player[projectile.owner];
+            Player player = Main.player[Projectile.owner];
             StandoPlayer pl = player.GetModPlayer<StandoPlayer>();
 
             damage *= 13 * pl.StandLevel;
@@ -218,39 +220,39 @@ namespace cool_jojo_stands.Projectiles
             if (type == 1)
             {
                 // Play explosion sound
-                Main.PlaySound(SoundID.Item14, projectile.position);
+                SoundEngine.PlaySound(SoundID.Item14, Projectile.position);
 
                 // Smoke Dust spawn
                 for (int i = 0; i < 50; i++)
                 {
-                    int dustIndex = Dust.NewDust(new Vector2(projectile.position.X, projectile.position.Y), projectile.width, projectile.height, 31, 0f, 0f, 100, default(Color), 2f);
+                    int dustIndex = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, DustID.Smoke, 0f, 0f, 100, default(Color), 2f);
                     Main.dust[dustIndex].velocity *= 1.4f;
                 }
                 // Fire Dust spawn
                 for (int i = 0; i < 80; i++)
                 {
-                    int dustIndex = Dust.NewDust(new Vector2(projectile.position.X, projectile.position.Y), projectile.width, projectile.height, 6, 0f, 0f, 100, default(Color), 3f);
+                    int dustIndex = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, DustID.Torch, 0f, 0f, 100, default(Color), 3f);
                     Main.dust[dustIndex].noGravity = true;
                     Main.dust[dustIndex].velocity *= 5f;
-                    dustIndex = Dust.NewDust(new Vector2(projectile.position.X, projectile.position.Y), projectile.width, projectile.height, 6, 0f, 0f, 100, default(Color), 2f);
+                    dustIndex = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, DustID.Torch, 0f, 0f, 100, default(Color), 2f);
                     Main.dust[dustIndex].velocity *= 3f;
                 }
                 // Large Smoke Gore spawn
                 for (int g = 0; g < 2; g++)
                 {
-                    int goreIndex = Gore.NewGore(new Vector2(projectile.position.X + (float)(projectile.width / 2) - 24f, projectile.position.Y + (float)(projectile.height / 2) - 24f), default(Vector2), Main.rand.Next(61, 64), 1f);
+                    int goreIndex = Gore.NewGore(Projectile.GetSource_FromThis(), new Vector2(Projectile.position.X + (float)(Projectile.width / 2) - 24f, Projectile.position.Y + (float)(Projectile.height / 2) - 24f), default(Vector2), Main.rand.Next(61, 64), 1f);
                     Main.gore[goreIndex].scale = 1.5f;
                     Main.gore[goreIndex].velocity.X = Main.gore[goreIndex].velocity.X + 1.5f;
                     Main.gore[goreIndex].velocity.Y = Main.gore[goreIndex].velocity.Y + 1.5f;
-                    goreIndex = Gore.NewGore(new Vector2(projectile.position.X + (float)(projectile.width / 2) - 24f, projectile.position.Y + (float)(projectile.height / 2) - 24f), default(Vector2), Main.rand.Next(61, 64), 1f);
+                    goreIndex = Gore.NewGore(Projectile.GetSource_FromThis(), new Vector2(Projectile.position.X + (float)(Projectile.width / 2) - 24f, Projectile.position.Y + (float)(Projectile.height / 2) - 24f), default(Vector2), Main.rand.Next(61, 64), 1f);
                     Main.gore[goreIndex].scale = 1.5f;
                     Main.gore[goreIndex].velocity.X = Main.gore[goreIndex].velocity.X - 1.5f;
                     Main.gore[goreIndex].velocity.Y = Main.gore[goreIndex].velocity.Y + 1.5f;
-                    goreIndex = Gore.NewGore(new Vector2(projectile.position.X + (float)(projectile.width / 2) - 24f, projectile.position.Y + (float)(projectile.height / 2) - 24f), default(Vector2), Main.rand.Next(61, 64), 1f);
+                    goreIndex = Gore.NewGore(Projectile.GetSource_FromThis(), new Vector2(Projectile.position.X + (float)(Projectile.width / 2) - 24f, Projectile.position.Y + (float)(Projectile.height / 2) - 24f), default(Vector2), Main.rand.Next(61, 64), 1f);
                     Main.gore[goreIndex].scale = 1.5f;
                     Main.gore[goreIndex].velocity.X = Main.gore[goreIndex].velocity.X + 1.5f;
                     Main.gore[goreIndex].velocity.Y = Main.gore[goreIndex].velocity.Y - 1.5f;
-                    goreIndex = Gore.NewGore(new Vector2(projectile.position.X + (float)(projectile.width / 2) - 24f, projectile.position.Y + (float)(projectile.height / 2) - 24f), default(Vector2), Main.rand.Next(61, 64), 1f);
+                    goreIndex = Gore.NewGore(Projectile.GetSource_FromThis(), new Vector2(Projectile.position.X + (float)(Projectile.width / 2) - 24f, Projectile.position.Y + (float)(Projectile.height / 2) - 24f), default(Vector2), Main.rand.Next(61, 64), 1f);
                     Main.gore[goreIndex].scale = 1.5f;
                     Main.gore[goreIndex].velocity.X = Main.gore[goreIndex].velocity.X - 1.5f;
                     Main.gore[goreIndex].velocity.Y = Main.gore[goreIndex].velocity.Y - 1.5f;

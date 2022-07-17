@@ -11,39 +11,39 @@ namespace cool_jojo_stands.Projectiles.Minions
 {
     public class SilverChariot : Stand
     {
-        Vector2[] _armShift = new Vector2[10];
-        float[] _armPhase = new float[10];
+        Vector2[] armShift = new Vector2[10];
+        float[] armPhase = new float[10];
         float
-            _armSpeed = 35f,
-            _armLength = 20f;
+            armSpeed = 35f,
+            armLenght = 20f;
 
         public SilverChariot()
         {
             viewEnemyDist = 300f;  // View enemy distance (from stand to enemy)
             chasePlayerSpeed = 6f; // Standart chase player speed (normal speed)
-            _maxSpeed = 10000f;     // ... i don't use it
-            _maxPlayerDistance = 400f;  // Max player distance to chase with normal speed
-            _inertia = 20f;         // Physycal variable
-            _maxAgressiveDistance = 380f;        // Max player distance to attack enemy
-            _attackSpeed = 10;      // Stand attack speed
+            maxSpeed = 10000f;     // ... i don't use it
+            maxPlayerDist = 400f;  // Max player distance to chase with normal speed
+            inertia = 20f;         // Physycal variable
+            maxDist = 380f;        // Max player distance to attack enemy
+            AttackSpeed = 10;      // Stand attack speed
 
             if (Main.rand != null)
                 for (int i = 0; i < 10; i++)
                 {
-                    _armPhase[i] = Main.rand.NextFloat(MathHelper.TwoPi);
-                    _armShift[i] = new Vector2(Main.rand.NextFloat(-15f, 5f), Main.rand.NextFloat(-15f, 15f));
+                    armPhase[i] = Main.rand.NextFloat(MathHelper.TwoPi);
+                    armShift[i] = new Vector2(Main.rand.NextFloat(-15f, 5f), Main.rand.NextFloat(-15f, 15f));
                 }
         }
 
-        public override void Behaviour()
+        public override void Behavior()
         {
-            BehaviourStart();
+            BehavourStart();
 
-            _lastAttack++;
+            lastAttack++;
 
             ChasePlayer();
 
-            if (_standPlayer.StandManualControl)
+            if (pl.StandManualControl)
                 ManualControlNear();
             else
                 ChaseNPCNear();
@@ -52,12 +52,12 @@ namespace cool_jojo_stands.Projectiles.Minions
             CheckPlayerDist();
 
             SpeedProcessing();
-            BehaviourEnd();
+            BehavourEnd();
 
-            if (_standPlayer.StandPornoleffSetBonus > 0)
-                _attackSpeed = 20;
+            if (pl.StandPornoleffSetBonus > 0)
+                AttackSpeed = 20;
             else
-                _attackSpeed = 10;
+                AttackSpeed = 10;
 
             CheckDamage();
         }
@@ -67,125 +67,125 @@ namespace cool_jojo_stands.Projectiles.Minions
          *****************/
         public override void SetStaticDefaults()
         {
-            Main.projFrames[projectile.type] = 15;
+            Main.projFrames[Projectile.type] = 15;
             DisplayName.SetDefault("Silver Chariot");
-            Main.projPet[projectile.type] = true;
+            Main.projPet[Projectile.type] = true;
         }
 
         public override void SetDefaults()
         {
-            projectile.netImportant = true;
-            projectile.width = 92;
-            projectile.height = 92;
-            projectile.friendly = true;
-            projectile.penetrate = -1;
-            projectile.timeLeft = 239;
-            projectile.tileCollide = false;
-            projectile.melee = true;
-            projectile.ignoreWater = true;
-            projectile.alpha = 255;
+            Projectile.netImportant = true;
+            Projectile.width = 92;
+            Projectile.height = 92;
+            Projectile.friendly = true;
+            Projectile.penetrate = -1;
+            Projectile.timeLeft = 239;
+            Projectile.tileCollide = false;
+            Projectile.DamageType = DamageClass.Melee;
+            Projectile.ignoreWater = true;
+            Projectile.alpha = 255;
         }
 
-        public override bool CanDamage() => false;
+        public override bool? CanDamage() => false;
         public override bool? CanCutTiles() => false;
         public override bool MinionContactDamage() => false;
 
         /* Select animation frame function */
         public override void SelectFrame()
         {
-            if (projectile.alpha > 30)
-                projectile.alpha -= 8;
+            if (Projectile.alpha > 30)
+                Projectile.alpha -= 8;
 
-            StandoPlayer pl = Main.player[projectile.owner].GetModPlayer<StandoPlayer>();
+            StandoPlayer pl = Main.player[Projectile.owner].GetModPlayer<StandoPlayer>();
 
-            projectile.frameCounter++;
+            Projectile.frameCounter++;
 
-            if (_attacking)
+            if (attacking)
             {
                 if (pl.StandPornoleffSetBonus > 0 || true)
                 {
-                    if (projectile.frameCounter >= 4)
+                    if (Projectile.frameCounter >= 4)
                     {
-                        projectile.frame = 8 + (projectile.frame + 1) % 2;
-                        projectile.frameCounter = 0;
+                        Projectile.frame = 8 + (Projectile.frame + 1) % 2;
+                        Projectile.frameCounter = 0;
                     }
                 }
                 else
                 {
-                    if (projectile.frame == 7 && projectile.frameCounter >= 7)
+                    if (Projectile.frame == 7 && Projectile.frameCounter >= 7)
                     {
-                        projectile.frameCounter = 0;
-                        projectile.frame = 4 + Main.rand.Next(3);
+                        Projectile.frameCounter = 0;
+                        Projectile.frame = 4 + Main.rand.Next(3);
                     }
-                    else if (projectile.frame != 7 && projectile.frameCounter >= 6)
+                    else if (Projectile.frame != 7 && Projectile.frameCounter >= 6)
                     {
-                        projectile.frameCounter = 0;
-                        projectile.frame = 7;
+                        Projectile.frameCounter = 0;
+                        Projectile.frame = 7;
                     }
                 }
             }
-            else if (projectile.frameCounter >= 10)
+            else if (Projectile.frameCounter >= 10)
             {
-                projectile.frameCounter = 0;
-                projectile.frame = (projectile.frame + 1) % 4;
+                Projectile.frameCounter = 0;
+                Projectile.frame = (Projectile.frame + 1) % 4;
             }
         }
 
         /* Predraw function */
-        public override bool PreDraw(SpriteBatch spriteBatch, Color lightColor)
+        public override bool PreDraw(ref Color lightColor)
         {
-            if (_standPlayer.StandPornoleffSetBonus == 0 && !_attacking && false)
+            if (pl.StandPornoleffSetBonus == 0 && !attacking && false)
                 return true;
 
-            Vector2 direction = _targetPosition - projectile.position;
+            Vector2 direction = targetPos - Projectile.position;
             direction.Normalize();
 
             ////////////////////////
             direction = new Vector2(1, 0);
 
-            Texture2D texture = ModContent.GetTexture("cool_jojo_stands/Projectiles/Minions/SilverChariot_Arm");
+            Texture2D texture = ModContent.Request<Texture2D>("cool_jojo_stands/Projectiles/Minions/SilverChariot_Arm").Value;
             Vector2 position;
             Microsoft.Xna.Framework.Rectangle? sourceRectangle = new Microsoft.Xna.Framework.Rectangle?();
             Vector2 origin = Vector2.Zero;
             float rotation = 0;
-            lightColor = projectile.GetAlpha(lightColor);
+            lightColor = Projectile.GetAlpha(lightColor);
 
             for (int i = 0; i < 10; i++)
             {
-                float si = (float)Math.Sin(_armPhase[i]);
+                float si = (float)Math.Sin(armPhase[i]);
 
                 if (si < -0.9)
                 {
-                    _armShift[i] = new Vector2(Main.rand.NextFloat(-15f, 5f), Main.rand.NextFloat(-15f, 15f));
-                    _armPhase[i] -= Main.rand.NextFloat(0f, 0.8f) * _armSpeed / 60f;
+                    armShift[i] = new Vector2(Main.rand.NextFloat(-15f, 5f), Main.rand.NextFloat(-15f, 15f));
+                    armPhase[i] -= Main.rand.NextFloat(0f, 0.8f) * armSpeed / 60f;
                 }
 
                 float[] oldPhase = new float[3] {
-                    _armPhase[i] - _armSpeed / 180f,
-                    _armPhase[i] - _armSpeed / 120f,
-                    _armPhase[i] - _armSpeed / 60f
+                    armPhase[i] - armSpeed / 180f,
+                    armPhase[i] - armSpeed / 120f,
+                    armPhase[i] - armSpeed / 60f
                 };
 
                 Vector2[] oldPos = new Vector2[3];
 
                 if (!Main.gamePaused)
-                  _armPhase[i] += _armSpeed / 60f;
+                  armPhase[i] += armSpeed / 60f;
 
-                if (projectile.spriteDirection == -1)
+                if (Projectile.spriteDirection == -1)
                 {
-                    position = projectile.Center + _armShift[i] - _armLength * direction * si;
+                    position = Projectile.Center + armShift[i] - armLenght * direction * si;
                     for (int l = 0; l < 3; l++)
-                        oldPos[l] = projectile.Center - _armLength * direction * (float)Math.Sin(oldPhase[l]);
+                        oldPos[l] = Projectile.Center - armLenght * direction * (float)Math.Sin(oldPhase[l]);
                     ///rotation = attackAngle - (float)Math.PI * Math.Sign(attackAngle);
                     ///rotation = (rotation > invMaxAttackAngle) ? invMaxAttackAngle :
                     ///((rotation < invMinAttackAngle) ? invMinAttackAngle : rotation);
                 }
                 else
                 {
-                    position = projectile.Center + _armShift[i] + _armLength * direction * si - new Vector2(_armLength * 0.8f, 0);
+                    position = Projectile.Center + armShift[i] + armLenght * direction * si - new Vector2(armLenght * 0.8f, 0);
 
                     for (int l = 0; l < 3; l++)
-                      oldPos[l] = projectile.Center + _armShift[i] + _armLength * direction * (float)Math.Sin(oldPhase[l]) - new Vector2(_armLength * 0.8f, 0);
+                      oldPos[l] = Projectile.Center + armShift[i] + armLenght * direction * (float)Math.Sin(oldPhase[l]) - new Vector2(armLenght * 0.8f, 0);
                     ///rotation = (attackAngle > maxAttackAngle) ? maxAttackAngle :
                     ///((attackAngle < minAttackAngle) ? minAttackAngle : attackAngle);
 
@@ -205,7 +205,7 @@ namespace cool_jojo_stands.Projectiles.Minions
                     rotation,
                     origin,
                     1f,
-                    (projectile.spriteDirection == -1) ? SpriteEffects.FlipHorizontally : SpriteEffects.None,
+                    (Projectile.spriteDirection == -1) ? SpriteEffects.FlipHorizontally : SpriteEffects.None,
                     0.0f);
 
                 for (int l = 0; l < 3; l++)
@@ -217,7 +217,7 @@ namespace cool_jojo_stands.Projectiles.Minions
                         rotation,
                         origin,
                         1f,
-                        (projectile.spriteDirection == -1) ? SpriteEffects.FlipHorizontally : SpriteEffects.None,
+                        (Projectile.spriteDirection == -1) ? SpriteEffects.FlipHorizontally : SpriteEffects.None,
                         0.0f);
 
                 lightColor = last;
@@ -229,13 +229,13 @@ namespace cool_jojo_stands.Projectiles.Minions
         /* Star Platinum dust function */
         public override void CreateDust()
         {
-            Lighting.AddLight(projectile.Center, 0.7f, 0.7f, 0.7f);
+            Lighting.AddLight(Projectile.Center, 0.7f, 0.7f, 0.7f);
         }
 
         /* Stand kill function */
         public override void Kill(int timeLeft)
         {
-            Player player = Main.player[projectile.owner];
+            Player player = Main.player[Projectile.owner];
             StandoPlayer pl = player.GetModPlayer<StandoPlayer>();
             pl.StandSpawned = false;
         }

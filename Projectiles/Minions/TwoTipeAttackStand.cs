@@ -26,28 +26,28 @@ namespace cool_jojo_stands.Projectiles.Minions
         {
         }
 
-        public override void Behaviour()
+        public override void Behavior()
         {
-            Player player = Main.player[projectile.owner];
+            Player player = Main.player[Projectile.owner];
             const float PlayerStayDist = 40f;
 
-            projectile.ai[0] -= 1 / 60f;
-            projectile.ai[1] -= 1 / 60f;
+            Projectile.ai[0] -= 1 / 60f;
+            Projectile.ai[1] -= 1 / 60f;
 
             /****************
              * Chase Player *
              ****************/
-            Vector2 Direction = player.Center - projectile.Center;
+            Vector2 Direction = player.Center - Projectile.Center;
             Direction.X -= PlayerStayDist * player.direction;
             Direction.Y -= 30f;
 
             Direction.Normalize();
 
-            float TargetDist = Vector2.Distance(player.Center - new Vector2(PlayerStayDist * player.direction, 30f), projectile.Center);
-            int NewDirection = Main.player[projectile.owner].direction;
-            Vector2 NewVelocity = projectile.velocity;
+            float TargetDist = Vector2.Distance(player.Center - new Vector2(PlayerStayDist * player.direction, 30f), Projectile.Center);
+            int NewDirection = Main.player[Projectile.owner].direction;
+            Vector2 NewVelocity = Projectile.velocity;
 
-            if (TypeOfAttack != 0 || projectile.ai[0] < 0.01f)
+            if (TypeOfAttack != 0 || Projectile.ai[0] < 0.01f)
             {
                 AUA = false;
                 atacking = false;
@@ -72,10 +72,10 @@ namespace cool_jojo_stands.Projectiles.Minions
                     {
                         float distance = Vector2.Distance(npc.Center, player.Center);
 
-                        if ((distance < targetDist) && Collision.CanHitLine(projectile.position, projectile.width, projectile.height, npc.position, npc.width, npc.height))
+                        if ((distance < targetDist) && Collision.CanHitLine(Projectile.position, Projectile.width, Projectile.height, npc.position, npc.width, npc.height))
                         {
-                            targetDist = Vector2.Distance(npc.Center, projectile.Center);
-                            trgdir = npc.Center - projectile.Center;
+                            targetDist = Vector2.Distance(npc.Center, Projectile.Center);
+                            trgdir = npc.Center - Projectile.Center;
                             trgdir.X = Math.Sign(trgdir.X);
                             targetPos = npc.Center;
                             AUA = true;
@@ -88,34 +88,34 @@ namespace cool_jojo_stands.Projectiles.Minions
                     if (targetPos == new Vector2(0f, 0f))
                     {
                         AUA = false;
-                        projectile.ai[1] = 0f;
+                        Projectile.ai[1] = 0f;
                     }
                     ///Direction = targetPos - projectile.Center;
                     ///Direction.Normalize;
                     NewDirection = Math.Sign(trgdir.X);
 
-                    if (projectile.ai[0] < 0.01f || projectile.ai[1] > 0.01f)
+                    if (Projectile.ai[0] < 0.01f || Projectile.ai[1] > 0.01f)
                     {
-                        if (projectile.ai[1] < 0.01f && projectile.ai[0] < 0.01f)
+                        if (Projectile.ai[1] < 0.01f && Projectile.ai[0] < 0.01f)
                         {
-                            projectile.ai[1] = 1.09f;
+                            Projectile.ai[1] = 1.09f;
                         }
-                        else if (projectile.ai[1] % 0.1f < 1f / 60f)
+                        else if (Projectile.ai[1] % 0.1f < 1f / 60f)
                         {
                             ///StandoPlayer.Talk((projectile.ai[1] % 0.1f).ToString());
-                            Vector2 D = targetPos - projectile.Center;
+                            Vector2 D = targetPos - Projectile.Center;
                             D.Normalize();
 
                             Vector2 ShootV = D * ShootVel;
 
                             ShootV = ShootV.RotatedByRandom(Math.PI / 12);
 
-                            int proj = Projectile.NewProjectile(projectile.Center.X + NewDirection * projectile.Size.X * 0.2f, projectile.Center.Y - projectile.Size.Y * 0.2f, ShootV.X, ShootV.Y, Shoot, projectile.damage, projectile.knockBack, projectile.owner, 0f, 0f);
+                            int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center.X + NewDirection * Projectile.Size.X * 0.2f, Projectile.Center.Y - Projectile.Size.Y * 0.2f, ShootV.X, ShootV.Y, Shoot, Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, 0f);
                             Main.projectile[proj].timeLeft = 300;
                             Main.projectile[proj].netUpdate = true;
                         }
 
-                        projectile.ai[0] = 2f;
+                        Projectile.ai[0] = 2f;
                     }
 
                     atacking = true;
@@ -141,11 +141,11 @@ namespace cool_jojo_stands.Projectiles.Minions
 
                         if ((distance < targetDist)/* && Collision.CanHitLine(projectile.position, projectile.width, projectile.height, npc.position, npc.width, npc.height)*/)
                         {
-                            targetDist = Vector2.Distance(npc.Center, projectile.Center);
-                            trgdir = npc.Center - projectile.Center;
+                            targetDist = Vector2.Distance(npc.Center, Projectile.Center);
+                            trgdir = npc.Center - Projectile.Center;
                             trgdir.Y = 0f;
                             trgdir.X = Math.Sign(trgdir.X);
-                            targetPos = npc.Center - trgdir * (npc.width + projectile.width) * 0.45f;
+                            targetPos = npc.Center - trgdir * (npc.width + Projectile.width) * 0.45f;
                             AUA = true;
                         }
                     }
@@ -153,11 +153,11 @@ namespace cool_jojo_stands.Projectiles.Minions
 
                 if (AUA)
                 {
-                    Direction = targetPos - projectile.Center;
+                    Direction = targetPos - Projectile.Center;
                     Direction.Normalize();
                     NewDirection = Math.Sign(trgdir.X);
 
-                    if (targetDist < projectile.width)
+                    if (targetDist < Projectile.width)
                         atacking = true;
                 }
             }
@@ -165,9 +165,9 @@ namespace cool_jojo_stands.Projectiles.Minions
             /*************************
              * Check Player distance *
              *************************/
-            if (Vector2.Distance(player.Center, projectile.Center) > MaxDist)
+            if (Vector2.Distance(player.Center, Projectile.Center) > MaxDist)
             {
-                Direction = player.Center - projectile.Center;
+                Direction = player.Center - Projectile.Center;
                 Direction.X -= 30f * player.direction;
                 Direction.Y -= 30f;
 
@@ -175,9 +175,9 @@ namespace cool_jojo_stands.Projectiles.Minions
 
                 AUA = atacking = false;
             }
-            if (Vector2.Distance(player.Center, projectile.Center) > maxPlayerDist + 239)
+            if (Vector2.Distance(player.Center, Projectile.Center) > maxPlayerDist + 239)
             {
-                projectile.position = player.Center - new Vector2(30f * player.direction, 30f);
+                Projectile.position = player.Center - new Vector2(30f * player.direction, 30f);
                 TargetDist = 0;
                 NewVelocity = new Vector2(0, 0);
             }
@@ -194,36 +194,36 @@ namespace cool_jojo_stands.Projectiles.Minions
                 else
                 {
                     float temp = inertia * 0.5f;
-                    NewVelocity = (projectile.velocity * temp + Direction * chasePlayerSpeed) / (temp + 1);
+                    NewVelocity = (Projectile.velocity * temp + Direction * chasePlayerSpeed) / (temp + 1);
                 }
             }
             else
                 NewVelocity *= 0.833333333f;
 
             if (NewVelocity.HasNaNs())
-                NewVelocity = projectile.velocity;  // This is bug fix ^_^
+                NewVelocity = Projectile.velocity;  // This is bug fix ^_^
 
-            if (projectile.velocity.Length() > maxSpeed)
+            if (Projectile.velocity.Length() > maxSpeed)
             {
-                projectile.velocity.Normalize();
-                projectile.velocity *= 9;
+                Projectile.velocity.Normalize();
+                Projectile.velocity *= 9;
             }
 
-            projectile.direction = NewDirection;
-            projectile.spriteDirection = projectile.direction;
-            projectile.velocity = NewVelocity;
+            Projectile.direction = NewDirection;
+            Projectile.spriteDirection = Projectile.direction;
+            Projectile.velocity = NewVelocity;
             SelectFrame();
             CreateDust();
-            projectile.netUpdate = true;
+            Projectile.netUpdate = true;
         }
 
         public override void CheckActive()
         {
-            Player player = Main.player[projectile.owner];
+            Player player = Main.player[Projectile.owner];
             StandoPlayer pl = player.GetModPlayer<StandoPlayer>();
 
             if (pl.HaveStand)
-                projectile.timeLeft = 2;
+                Projectile.timeLeft = 2;
 
             if (pl.StandJustSpawned)
             {
@@ -234,7 +234,7 @@ namespace cool_jojo_stands.Projectiles.Minions
             if (pl.StandSpawned && cool_jojo_stands.StandSummonHT.JustPressed || player.dead)
             {
                 pl.StandSpawned = false;
-                this.projectile.Kill();
+                this.Projectile.Kill();
             }
         }
 

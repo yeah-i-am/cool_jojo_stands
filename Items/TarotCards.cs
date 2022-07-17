@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -9,9 +10,9 @@ namespace cool_jojo_stands.Items
 {
     class TarotCards : ModItem
     {
-        public string[] stands =
+        string[] stands =
         {
-            "HermitPurple", "HierophantGreen", "MagicianRed", "StarPlatinum" , "TheWorld"
+          "StarPlatinumStand", "MagicianRedStand", "HierophantGreenStand"///, "HermitPurpleStand"
         };
 
         public override void SetStaticDefaults()
@@ -19,38 +20,37 @@ namespace cool_jojo_stands.Items
             DisplayName.SetDefault("Tarot cards");
             Tooltip.SetDefault("Picks your stand");
 
-            Main.RegisterItemAnimation(item.type, new Terraria.DataStructures.DrawAnimationVertical(7, 12));
+            Main.RegisterItemAnimation(Item.type, new Terraria.DataStructures.DrawAnimationVertical(7, 12));
         }
         public override void SetDefaults()
         {
-            item.width = 40;
-            item.height = 40;
-            item.useTime = 40;
-            item.useAnimation = 40;
-            item.useStyle = ItemUseStyleID.HoldingUp;
-            item.value = Item.buyPrice(0, 0, 47, 0);
-            item.rare = ItemRarityID.Purple;
-            item.UseSound = SoundID.Item1;
-            item.maxStack = 99;
-            item.consumable = true;
-            item.autoReuse = false;
-            item.noUseGraphic = true;
-            item.shoot = ModContent.ProjectileType<Projectiles.TarotCards>();
-            item.shootSpeed = 40f;
+            Item.width = 40;
+            Item.height = 40;
+            Item.useTime = 40;
+            Item.useAnimation = 40;
+            Item.useStyle = ItemUseStyleID.HoldUp;
+            Item.value = Item.buyPrice(0, 0, 47, 0);
+            Item.rare = ItemRarityID.Purple;
+            Item.UseSound = SoundID.Item1;
+            Item.maxStack = 99;
+            Item.consumable = true;
+            Item.autoReuse = false;
+            Item.noUseGraphic = true;
+            Item.shoot = ModContent.ProjectileType<Projectiles.TarotCards>();
+            Item.shootSpeed = 40f;
         }
 
         public override void AddRecipes()
         {
-            ModRecipe recipe = new ModRecipe(mod);
+            Recipe recipe = CreateRecipe();
             recipe.AddIngredient(ItemID.FallenStar, 1);
             recipe.AddIngredient(ItemID.Cactus, 10);
             recipe.AddIngredient(ItemID.GoldCoin, 10);
             recipe.AddTile(TileID.Tables);
-            recipe.SetResult(this);
-            recipe.AddRecipe();
+            recipe.Register();
         }
 
-        public override bool Shoot(Player player, ref Vector2 position, ref float speedX, ref float speedY, ref int type, ref int damage, ref float knockBack)
+        public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
         {
             StandoPlayer pl = player.GetModPlayer<StandoPlayer>();
 
@@ -59,17 +59,26 @@ namespace cool_jojo_stands.Items
 
             Terraria.Utilities.UnifiedRandom rand = Main.rand;
 
-            int k = rand.Next(stands.Length);
+            if (rand.NextBool(1000) && !player.HasBuff(ModContent.BuffType<Buffs.StarPlatinumRequiemStand>()))
+            {
+                pl.DeleteStand();
+                player.AddBuff(ModContent.BuffType<Buffs.StarPlatinumRequiemStand>(), 239);
 
-            while (player.HasBuff(mod.BuffType(stands[k] + "Stand")))
-                k = rand.Next(stands.Length);
+                return true;
+            }
+            else
+            {
+                int k = rand.Next(stands.Length);
 
-            pl.DeleteStand();
-            pl.StandBuffName = stands[k];
-            pl.Stand = (StandType)Enum.Parse(typeof(StandType), stands[k]);
-            player.AddBuff(mod.BuffType(stands[k] + "Stand"), 32767);
+                while (player.HasBuff(Mod.Find<ModBuff>(stands[k]).Type))
+                    k = rand.Next(stands.Length);
 
-            return true;
+                pl.DeleteStand();
+
+                player.AddBuff(Mod.Find<ModBuff>(stands[k]).Type, 239);
+
+                return true;
+            }
         }
     }
 }

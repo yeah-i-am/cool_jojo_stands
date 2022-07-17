@@ -9,13 +9,13 @@ namespace cool_jojo_stands.Buffs
 {
     public class HierophantGreenStand : ModBuff
     {
-        public override void SetDefaults()
+        public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("You are the owner of Hierophant Green");
             Description.SetDefault("nO oNe CaN jUsT dEfLeCt ThE eMeRaLd SpLaSh\n"
                 + "Special Ability: None");
             Main.buffNoSave[Type] = false; // false
-            canBeCleared = false;
+            BuffID.Sets.NurseCannotRemoveDebuff[Type] = true;
             Main.buffNoTimeDisplay[Type] = true;
             Main.debuff[Type] = true;
         }
@@ -24,19 +24,19 @@ namespace cool_jojo_stands.Buffs
         {
             StandoPlayer StandPlayer = player.GetModPlayer<StandoPlayer>();
 
-            if (StandPlayer.Stand != StandType.HierophantGreen)
+            if (!StandPlayer.HaveHierophantGreenStand)
             {
-                StandPlayer.Stand = StandType.HierophantGreen;
+                StandPlayer.HaveHierophantGreenStand = true;
                 StandPlayer.HaveStand = true;
                 StandPlayer.StandBuffName = "HierophantGreen";
             }
 
-            player.buffTime[buffIndex] = 32767;
+            player.buffTime[buffIndex] = 2390;
         }
 
         public override void ModifyBuffTip(ref string tip, ref int rare)
         {
-            rare = ItemRarityID.Expert;
+            rare = ItemRarityID.Green;
         }
     }
 }

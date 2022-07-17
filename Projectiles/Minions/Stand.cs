@@ -7,30 +7,25 @@ using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
 using cool_jojo_stands.NPCs;
-using static cool_jojo_stands.cool_jojo_stands;
 
 namespace cool_jojo_stands.Projectiles.Minions
 {
     public abstract class Stand : Minion
     {
-        public virtual int StandDamage { get; protected set; }
-        public virtual int StandSpeed { get; protected set; }
-
-
         /* tech variables */
-        protected Player _player;
-        protected StandoPlayer _standPlayer;
-        protected float _targetDistance, _maxTargetDistance, // 0o0 Phew! yeah, its different variables
-            _maxManualTargetDistance;
-        protected int _newDirection;
-        protected Vector2 _newStandDirection, _targetDirection, _standPosition, _standDirection, _targetPosition;
+        protected Player player;
+        protected StandoPlayer pl;
+        protected float TargetDist, targetDist, // 0o0 Phew! yeah, its different variables
+            manualControlNearEnemyDist;
+        protected int NewDirection;
+        protected Vector2 NewVelocity, trgDir, standPos, Direction, targetPos;
         protected float ReloadTime{
-            get => projectile.ai[0];
-            set => projectile.ai[0] = value;
+            get => Projectile.ai[0];
+            set => Projectile.ai[0] = value;
         }
         protected float AttackTime{
-            get => projectile.ai[1];
-            set => projectile.ai[1] = value;
+            get => Projectile.ai[1];
+            set => Projectile.ai[1] = value;
         }
 
         /* Stand parameters */
@@ -38,77 +33,84 @@ namespace cool_jojo_stands.Projectiles.Minions
 
         protected float viewEnemyDist;        // View enemy distance (from stand to enemy)
         protected float chasePlayerSpeed;     // Standart chase player speed (normal speed)
-        protected float _maxSpeed;             // why not?
-        protected float _maxPlayerDistance;        // Max player distance to chase with normal speed
-        protected float _inertia;              // Physycal variable
-        protected float _maxAgressiveDistance;              // Max player distance to attack enemy
-        protected bool _havingTarget;       // Stand have target
-        protected bool _attacking;             // Stand attack target
-        protected float _attackSpeed;          // Stand attack speed
-        protected int _lastAttack = 0;         // Last attack time
-        protected float _maxAttackTime = 2f;   // Max attacking stand time
-        protected float _maxReloadTime = 1.5f; // Time needs to reload stand attack
-        protected float _speedReducePower = 0.833333333f; // Speed reduce
+        protected float maxSpeed;             // why not?
+        protected float maxPlayerDist;        // Max player distance to chase with normal speed
+        protected float inertia;              // Physycal variable
+        protected float maxDist;              // Max player distance to attack enemy
+        protected bool StandHaveTarget;       // Stand have target
+        protected bool attacking;             // Stand attack target
+        protected float AttackSpeed;          // Stand attack speed
+        protected int lastAttack = 0;         // Last attack time
+        protected float maxAttackTime = 2f;   // Max attacking stand time
+        protected float maxReloadTime = 1.5f; // Time needs to reload stand attack
+        public int Shoot;                     // Stand shoot projectile id
+        public float ShootVel;                // Stand shoot velocity
 
-        public int shootId;                     // Stand shoot projectile id
-        public float shootVelocity;                // Stand shoot velocity
+        protected float SpeedRedusePower = 0.833333333f; // Speed reduce
 
         /* Hurt function */
         public void Hurt(PlayerDeathReason damageSource, int Damage, int hitDirection, bool pvp = false, bool quiet = false, bool Crit = false, int cooldownCounter = -1)
         {
-            Main.player[projectile.owner].Hurt(damageSource, Damage, hitDirection, pvp, quiet, Crit, cooldownCounter);
+            Main.player[Projectile.owner].Hurt(damageSource, Damage, hitDirection, pvp, quiet, Crit, cooldownCounter);
         } /* End of 'Hurt' function */
 
         /* Check projectile function */
-        public static bool CheckStando(Projectile proj) =>
-            proj.modProjectile is Stand;
+        public static bool CheckStando( Projectile proj ) =>
+            proj.type == ModContent.ProjectileType<Projectiles.Minions.StarPlatinum>() ||
+            proj.type == ModContent.ProjectileType<Projectiles.Minions.HierophantGreen>() ||
+            proj.type == ModContent.ProjectileType<Projectiles.Minions.MagicianRed>() ||
+            proj.type == ModContent.ProjectileType<Projectiles.Minions.StarPlatinumRequiem>() ||
+            proj.type == ModContent.ProjectileType<Projectiles.HermitPurple>() ||
+            proj.type == ModContent.ProjectileType<Projectiles.Dolphin>() ||
+            proj.type == ModContent.ProjectileType<Projectiles.FireBlast>() ||
+            proj.type == ModContent.ProjectileType<Projectiles.EmeraldBlast>();
 
         /* Set tech variables to default value */
-        public virtual void BehaviourStart()
+        public virtual void BehavourStart()
         {
-            _player = Main.player[projectile.owner];
-            _standPlayer = _player.GetModPlayer<StandoPlayer>();
-            _havingTarget = false;
-            _attacking = false;
-            _targetPosition = Vector2.Zero;   // Target position
-            _maxTargetDistance = viewEnemyDist; // Max target distance or target distance if Stand have target
-            _standPosition = Vector2.Zero;    // Target position
-            _targetDirection = Vector2.Zero;      // Direction to target
-            _newStandDirection = projectile.velocity; // New stand velocity
-            _maxManualTargetDistance = 239f; // Near enemy distance if manual control mode on
+            player = Main.player[Projectile.owner];
+            pl = player.GetModPlayer<StandoPlayer>();
+            StandHaveTarget = false;
+            attacking = false;
+            targetPos = Vector2.Zero;   // Target position
+            targetDist = viewEnemyDist; // Max target distance or target distance if Stand have target
+            standPos = Vector2.Zero;    // Target position
+            trgDir = Vector2.Zero;      // Direction to target
+            NewVelocity = Projectile.velocity; // New stand velocity
+            manualControlNearEnemyDist = 239f; // Near enemy distance if manual control mode on
         } /* End of 'BehavourStart' function */
 
         /* Chase owner function */
         public void ChasePlayer()
         {
-            _standDirection = _player.Center - projectile.Center;
-            _standDirection.X -= stayPlayerDist.X * _player.direction;
-            _standDirection.Y -= stayPlayerDist.Y;
+            Direction = player.Center - Projectile.Center;
+            Direction.X -= stayPlayerDist.X * player.direction;
+            Direction.Y -= stayPlayerDist.Y;
 
-            _standDirection.Normalize();
+            Direction.Normalize();
 
-            _targetDistance = Vector2.Distance(_player.Center - new Vector2(stayPlayerDist.X * _player.direction, stayPlayerDist.Y), projectile.Center); // Player distance
-            _newDirection = Main.player[projectile.owner].direction;
+            TargetDist = Vector2.Distance(player.Center - new Vector2(stayPlayerDist.X * player.direction, stayPlayerDist.Y), Projectile.Center); // Player distance
+            NewDirection = Main.player[Projectile.owner].direction;
         } /* End of 'ChasePlayer' function */
 
         /* Manual control for standart near stand */
         public virtual void ManualControlNear()
         {
-            _havingTarget = true;
+            StandHaveTarget = true;
 
-            float DistToPlayer = Vector2.Distance(Main.MouseWorld, _player.Center);
-            _targetDirection = Main.MouseWorld - projectile.Center;
+            float DistToPlayer = Vector2.Distance(Main.MouseWorld, player.Center);
+            trgDir = Main.MouseWorld - Projectile.Center;
 
-            if (DistToPlayer >= _maxAgressiveDistance)
+            if (DistToPlayer >= maxDist)
             {
-                Vector2 trgDirection = Main.MouseWorld - _player.Center;
+                Vector2 trgDirection = Main.MouseWorld - player.Center;
                 trgDirection.Normalize();
-                _standPosition = _player.Center + trgDirection * _maxAgressiveDistance;
+                standPos = player.Center + trgDirection * maxDist;
             }
             else
-                _standPosition = Main.MouseWorld;
+                standPos = Main.MouseWorld;
 
-            _maxTargetDistance = Vector2.Distance(_standPosition, projectile.Center);
+            targetDist = Vector2.Distance(standPos, Projectile.Center);
 
             for (int k = 0; k < 200; k++)
             {
@@ -117,10 +119,10 @@ namespace cool_jojo_stands.Projectiles.Minions
 
                 if (npc.CanBeChasedBy(this, false) || targetDummy)
                 {
-                    float distance = Vector2.Distance(npc.Center, projectile.Center);
+                    float distance = Vector2.Distance(npc.Center, Projectile.Center);
 
-                    if (distance < _maxManualTargetDistance)
-                        _maxManualTargetDistance = distance;
+                    if (distance < manualControlNearEnemyDist)
+                        manualControlNearEnemyDist = distance;
                 }
             }
         } /* End of 'ManualControlNear' function */
@@ -128,36 +130,42 @@ namespace cool_jojo_stands.Projectiles.Minions
         /* Manual control for standart far stand */
         public virtual void ManualControlFar()
         {
-            _havingTarget = true;
+            StandHaveTarget = true;
 
-            float DistToPlayer = Vector2.Distance(Main.MouseWorld, _player.Center);
-            _targetDirection = Main.MouseWorld - projectile.Center;
+            float DistToPlayer = Vector2.Distance(Main.MouseWorld, player.Center);
+            trgDir = Main.MouseWorld - Projectile.Center;
 
-            if (DistToPlayer >= _maxAgressiveDistance)
+            if (Main.mouseRight)
             {
-                Vector2 trgDirection = Main.MouseWorld - _player.Center;
+                targetPos = Main.MouseWorld;
+                standPos = Projectile.position;
+                attacking = true;
+            }
+            else if (DistToPlayer >= maxDist)
+            {
+                Vector2 trgDirection = Main.MouseWorld - player.Center;
                 trgDirection.Normalize();
-                _standPosition = _player.Center + trgDirection * _maxAgressiveDistance;
+                standPos = player.Center + trgDirection * maxDist;
             }
             else
-                _standPosition = Main.MouseWorld;
+                standPos = Main.MouseWorld;
 
-            _maxTargetDistance = Vector2.Distance(_standPosition, projectile.Center);
+            targetDist = Vector2.Distance(standPos, Projectile.Center);
         } /* End of 'ManualControlFar' function */
 
         /* Chase NPC for standart near stand */
         public virtual void ChaseNPCNear()
         {
-            if (_player.HasMinionAttackTargetNPC)
+            if (player.HasMinionAttackTargetNPC)
             {
-                NPC npc = Main.npc[_player.MinionAttackTargetNPC];
+                NPC npc = Main.npc[player.MinionAttackTargetNPC];
 
-                _maxTargetDistance = Vector2.Distance(npc.Center, projectile.Center);
-                _targetDirection = npc.Center - projectile.Center;
-                _targetDirection.Y = 0;
-                _targetDirection.X = Math.Sign(_targetDirection.X);
-                _standPosition = npc.Center - _targetDirection * (npc.Hitbox.Width + projectile.width) * 0.37f;
-                _havingTarget = true;
+                targetDist = Vector2.Distance(npc.Center, Projectile.Center);
+                trgDir = npc.Center - Projectile.Center;
+                trgDir.Y = 0;
+                trgDir.X = Math.Sign(trgDir.X);
+                standPos = npc.Center - trgDir * (npc.Hitbox.Width + Projectile.width) * 0.37f;
+                StandHaveTarget = true;
             }
 
             for (int k = 0; k < 200; k++)
@@ -167,25 +175,25 @@ namespace cool_jojo_stands.Projectiles.Minions
 
                 if (npc.CanBeChasedBy(this, false) || targetDummy)
                 {
-                    float distance = Vector2.Distance(npc.Center, _player.Center);
+                    float distance = Vector2.Distance(npc.Center, player.Center);
 
-                    if (Main.mouseRight && distance < _maxPlayerDistance && npc.getRect().Contains((int)Main.MouseWorld.X, (int)Main.MouseWorld.Y))
-                        _player.MinionAttackTargetNPC = npc.whoAmI;
+                    if (Main.mouseRight && distance < maxPlayerDist && npc.getRect().Contains((int)Main.MouseWorld.X, (int)Main.MouseWorld.Y))
+                        player.MinionAttackTargetNPC = npc.whoAmI;
 
-                    if (targetDummy && Vector2.Distance(projectile.Center, npc.Center) < projectile.width * 0.7)
+                    if (targetDummy && Vector2.Distance(Projectile.Center, npc.Center) < Projectile.width * 0.7)
                     {
-                        _attacking = true;
+                        attacking = true;
                         continue;
                     }
 
-                    if (distance < _maxTargetDistance && !_player.HasMinionAttackTargetNPC && !targetDummy)
+                    if (distance < targetDist && !player.HasMinionAttackTargetNPC && !targetDummy)
                     {
-                        _maxTargetDistance = Vector2.Distance(npc.Center, projectile.Center);
-                        _targetDirection = npc.Center - projectile.Center;
-                        _targetDirection.Y = 0;
-                        _targetDirection.X = Math.Sign(_targetDirection.X);
-                        _standPosition = npc.Center - _targetDirection * (npc.Hitbox.Width + projectile.width) * 0.37f;
-                        _havingTarget = true;
+                        targetDist = Vector2.Distance(npc.Center, Projectile.Center);
+                        trgDir = npc.Center - Projectile.Center;
+                        trgDir.Y = 0;
+                        trgDir.X = Math.Sign(trgDir.X);
+                        standPos = npc.Center - trgDir * (npc.Hitbox.Width + Projectile.width) * 0.37f;
+                        StandHaveTarget = true;
                     }
                 }
             }
@@ -194,16 +202,16 @@ namespace cool_jojo_stands.Projectiles.Minions
         /* Chase NPC for standart far stand */
         public virtual void ChaseNPCFar()
         {
-            if (_player.HasMinionAttackTargetNPC)
+            if (player.HasMinionAttackTargetNPC)
             {
-                NPC npc = Main.npc[_player.MinionAttackTargetNPC];
+                NPC npc = Main.npc[player.MinionAttackTargetNPC];
 
-                _maxTargetDistance = Vector2.Distance(npc.Center, projectile.Center);
-                _targetDirection = npc.Center - projectile.Center;
-                _targetDirection.Y = 0;
-                _targetDirection.X = Math.Sign(_targetDirection.X);
-                _targetPosition = npc.Center;
-                _havingTarget = true;
+                targetDist = Vector2.Distance(npc.Center, Projectile.Center);
+                trgDir = npc.Center - Projectile.Center;
+                trgDir.Y = 0;
+                trgDir.X = Math.Sign(trgDir.X);
+                targetPos = npc.Center;
+                StandHaveTarget = true;
             }
 
             for (int k = 0; k < 200; k++)
@@ -212,20 +220,20 @@ namespace cool_jojo_stands.Projectiles.Minions
 
                 if (npc.CanBeChasedBy(this, false))
                 {
-                    float distance = Vector2.Distance(npc.Center, _player.Center);
+                    float distance = Vector2.Distance(npc.Center, player.Center);
 
                     if (Main.mouseRight && distance < viewEnemyDist && npc.getRect().Contains((int)Main.MouseWorld.X, (int)Main.MouseWorld.Y))
-                        _player.MinionAttackTargetNPC = npc.whoAmI;
+                        player.MinionAttackTargetNPC = npc.whoAmI;
 
-                    if (!_player.HasMinionAttackTargetNPC && (distance < _maxTargetDistance) &&
-                        Collision.CanHitLine(projectile.position, projectile.width, projectile.height, npc.position, npc.width, npc.height))
+                    if (!player.HasMinionAttackTargetNPC && (distance < targetDist) &&
+                        Collision.CanHitLine(Projectile.position, Projectile.width, Projectile.height, npc.position, npc.width, npc.height))
                     {
-                        _maxTargetDistance = Vector2.Distance(npc.Center, projectile.Center);
-                        _targetDirection = npc.Center - projectile.Center;
+                        targetDist = Vector2.Distance(npc.Center, Projectile.Center);
+                        trgDir = npc.Center - Projectile.Center;
 
-                        _targetDirection.X = Math.Sign(_targetDirection.X);
-                        _targetPosition = npc.Center;
-                        _havingTarget = true;
+                        trgDir.X = Math.Sign(trgDir.X);
+                        targetPos = npc.Center;
+                        StandHaveTarget = true;
                     }
                 }
             }
@@ -234,38 +242,38 @@ namespace cool_jojo_stands.Projectiles.Minions
         /* Processing stand speed */
         public void SpeedProcessing()
         {
-            if (_targetDistance > 1f || _havingTarget)
+            if (TargetDist > 1f || StandHaveTarget)
             {
-                if (Vector2.Distance(_player.Center, projectile.Center) > _maxPlayerDistance)
+                if (Vector2.Distance(player.Center, Projectile.Center) > maxPlayerDist)
                 {
-                    _newStandDirection = _standDirection * Math.Max(_player.velocity.Length(), 5f);
+                    NewVelocity = Direction * Math.Max(player.velocity.Length(), 5f);
                 }
-                else if (_standPlayer.StandManualControl && _maxTargetDistance < 23.9f)
+                else if (pl.StandManualControl && targetDist < 23.9f)
                 {
-                    _newStandDirection *= (float)Math.Pow(_maxTargetDistance / 23.9f, 0.39f);
+                    NewVelocity *= (float)Math.Pow(targetDist / 23.9f, 0.39f);
                 }
                 else
                 {
-                    float temp = _inertia * 0.5f;
-                    _newStandDirection = (projectile.velocity * temp + _standDirection * chasePlayerSpeed) / (temp + 1);
+                    float temp = inertia * 0.5f;
+                    NewVelocity = (Projectile.velocity * temp + Direction * chasePlayerSpeed) / (temp + 1);
 
-                    if (!_havingTarget && _newStandDirection.LengthSquared() > _targetDistance * _targetDistance)
+                    if (!StandHaveTarget && NewVelocity.LengthSquared() > TargetDist * TargetDist)
                     {
-                        _newStandDirection.Normalize();
-                        _newStandDirection *= _targetDistance;
+                        NewVelocity.Normalize();
+                        NewVelocity *= TargetDist;
                     }
                 }
             }
             else
-                _newStandDirection *= _speedReducePower;
+                NewVelocity *= SpeedRedusePower;
 
-            if (_newStandDirection.HasNaNs())
-                _newStandDirection = projectile.velocity;  // This is bug fix ^_^
+            if (NewVelocity.HasNaNs())
+                NewVelocity = Projectile.velocity;  // This is bug fix ^_^
 
-            if (projectile.velocity.Length() > _maxSpeed) // why not?
+            if (Projectile.velocity.Length() > maxSpeed) // why not?
             {
-                projectile.velocity.Normalize();
-                projectile.velocity *= _maxSpeed;
+                Projectile.velocity.Normalize();
+                Projectile.velocity *= maxSpeed;
             }
 
         } /* End of 'SpeedProcessing' function */
@@ -273,131 +281,102 @@ namespace cool_jojo_stands.Projectiles.Minions
         /* Check distance to player */
         public void CheckPlayerDist()
         {
-            float dist = Vector2.Distance(_player.Center, projectile.Center);
+            float dist = Vector2.Distance(player.Center, Projectile.Center);
 
-            if (dist > _maxAgressiveDistance)
+            if (dist > maxDist)
             {
-                _standDirection = _player.Center - projectile.Center;
-                _standDirection.X -= stayPlayerDist.X * _player.direction;
-                _standDirection.Y -= stayPlayerDist.Y;
+                Direction = player.Center - Projectile.Center;
+                Direction.X -= stayPlayerDist.X * player.direction;
+                Direction.Y -= stayPlayerDist.Y;
 
-                _standDirection.Normalize();
+                Direction.Normalize();
 
-                _havingTarget = _attacking = false;
+                StandHaveTarget = attacking = false;
             }
-            if (dist > _maxPlayerDistance + 239)
+            if (dist > maxPlayerDist + 239)
             {
-                projectile.position = _player.Center - new Vector2(stayPlayerDist.X * _player.direction, stayPlayerDist.Y);
-                _targetDistance = 0;
-                _newStandDirection = new Vector2(0, 0);
+                Projectile.position = player.Center - new Vector2(stayPlayerDist.X * player.direction, stayPlayerDist.Y);
+                TargetDist = 0;
+                NewVelocity = new Vector2(0, 0);
             }
         } /* End of 'CheckPlayerDist' function */
 
         /* Processing target for standart near stand */
         public virtual void TargetProcessingNear()
         {
-            if (_havingTarget)
+            if (StandHaveTarget)
             {
-                _standDirection = _standPosition - projectile.Center;
-                _standDirection.Normalize();
-                _newDirection = Math.Sign(_targetDirection.X);
+                Direction = standPos - Projectile.Center;
+                Direction.Normalize();
+                NewDirection = Math.Sign(trgDir.X);
 
-                if (_maxTargetDistance < projectile.width && !_standPlayer.StandManualControl)
-                    _attacking = true;
-                else if (_maxManualTargetDistance < projectile.width)
-                    _attacking = true;
+                if (targetDist < Projectile.width && !pl.StandManualControl)
+                    attacking = true;
+                else if (manualControlNearEnemyDist < Projectile.width)
+                    attacking = true;
             }
         } /* End of 'TargetProcessingNear' function */
 
         /* Processing target for standart far stand */
         public virtual void TargetProcessingFar()
         {
-            if (_havingTarget)
+            if (StandHaveTarget)
             {
-                if (_targetPosition == Vector2.Zero)
+                if (targetPos == Vector2.Zero)
                 {
                     AttackTime = 0f;
 
-                    if (!_standPlayer.StandManualControl)
-                        _havingTarget = false;
+                    if (!pl.StandManualControl)
+                        StandHaveTarget = false;
                 }
 
-                _newDirection = Math.Sign(_targetDirection.X);
+                NewDirection = Math.Sign(trgDir.X);
 
                 // TODO: redo
                 if (ReloadTime < 0.01f || AttackTime > 0.01f)
                 {
                     if (AttackTime < 0.01f && ReloadTime < 0.01f)
-                        AttackTime = _maxAttackTime;
+                        AttackTime = maxAttackTime;
 
-                    ReloadTime = _maxReloadTime;
+                    ReloadTime = maxReloadTime;
                 }
 
-                if (_standPlayer.StandManualControl)
+                if (pl.StandManualControl)
                 {
                     if (Main.mouseRight)
-                        _standDirection = new Vector2(0, 0);
+                        Direction = new Vector2(0, 0);
                     else
                     {
-                        _standDirection = _standPosition - projectile.Center;
-                        _standDirection.Normalize();
+                        Direction = standPos - Projectile.Center;
+                        Direction.Normalize();
                     }
 
-                    _newDirection = Math.Sign(_targetDirection.X);
+                    NewDirection = Math.Sign(trgDir.X);
                 }
                 else
-                    _attacking = true;
+                    attacking = true;
             }
         } /* End of 'TargetProcessingFar' function */
 
         /* Final of AI, set stand params */
-        public void BehaviourEnd()
+        public void BehavourEnd()
         {
-            projectile.direction = _newDirection;
-            projectile.spriteDirection = projectile.direction;
-            projectile.velocity = _newStandDirection;
+            Projectile.direction = NewDirection;
+            Projectile.spriteDirection = Projectile.direction;
+            Projectile.velocity = NewVelocity;
             SelectFrame();
             CreateDust();
-            PostUpdate();
-
-            if (projectile.owner == Main.myPlayer)
-            {
-                if (projectile.direction != Main.LocalPlayer.direction)
-                {
-                    Main.LocalPlayer.direction = projectile.direction;
-                    NetMessage.SendData(13, -1, -1, null, Main.myPlayer);
-                }
-                if (cool_jojo_stands.ManualingPlayers[Main.myPlayer])
-                {
-                    cool_jojo_stands.StandsPositions[projectile.owner] = projectile.position;
-                    if (Main.netMode == NetmodeID.MultiplayerClient)
-                    {
-                        ModPacket packet = cool_jojo_stands.mod.GetPacket();
-
-                        packet.Write((byte)StandMessageType.StandPosition);
-                        packet.Write(_player.whoAmI);
-                        packet.Write(projectile.position.X);
-                        packet.Write(projectile.position.Y);
-
-                        packet.Send();
-                    }
-                }
-            }
-            else if (projectile.owner != Main.myPlayer && cool_jojo_stands.ManualingPlayers[projectile.owner])
-            {
-                projectile.position = cool_jojo_stands.StandsPositions[projectile.owner];
-            }
-            projectile.netUpdate = true;
-        } /* End of 'BehaviourEnd' function */
+            Some();
+            Projectile.netUpdate = true;
+        } /* End of 'BehavourEnd' function */
 
         /* Damage npc function */
         public void CheckDamage()
         {
-            if (_lastAttack >= 60f / _attackSpeed)
+            if (lastAttack >= 60f / AttackSpeed)
             {
-                if (!Main.player[projectile.owner].GetModPlayer<StandoPlayer>().DisabledAttackings && ((cool_jojo_stands.ManualingPlayers[projectile.owner] && cool_jojo_stands.AttackingPlayers[projectile.owner]) || !cool_jojo_stands.ManualingPlayers[projectile.owner]))
                 Damage();
-                _lastAttack = 0;
+                lastAttack = 0;
             }
         } /* End of 'CheckDamage' function */
 
@@ -413,37 +392,52 @@ namespace cool_jojo_stands.Projectiles.Minions
          * Only for near stands */
         protected void Damage()
         {
-            StandoPlayer pl = Main.player[projectile.owner].GetModPlayer<StandoPlayer>();
-            Random rand = new Random((int)(Main.GlobalTime * 100));
+            StandoPlayer pl = Main.player[Projectile.owner].GetModPlayer<StandoPlayer>();
+            Random rand = new Random((int)(Main.GlobalTimeWrappedHourly * 100));
 
             for (int k = 0; k < 200; k++)
             {
                 NPC npc = Main.npc[k];
 
-                if (_attacking && npc.CanBeChasedBy(this, false) && !npc.friendly || npc.type == NPCID.TargetDummy)
-                    if (projectile.Colliding(projectile.Hitbox, npc.Hitbox))
+                if (attacking && npc.CanBeChasedBy(this, false) && !npc.friendly || npc.type == NPCID.TargetDummy)
+                    if (Projectile.Colliding(Projectile.Hitbox, npc.Hitbox))
                     {
-                        Vector2 Dir = npc.Center - projectile.Center;
+                        Vector2 Dir = npc.Center - Projectile.Center;
                         bool crit = rand.Next(10) > 7;
                         /// TODO: Balance SP damage
-                        int damage = (pl.StandLevel * pl.StandLevel) + pl.StandLevel;
+                        int damage = (int)Math.Pow(pl.StandLevel, 1.5) + pl.StandLevel;
+                        int hitDir = Math.Sign(Dir.X);
+                        float knockback = Projectile.knockBack;
 
-                        int hp = npc.life;
+                        // some fixes for work with leveled mod
+                        if (cool_jojo_stands.leveledModLoaded && cool_jojo_stands.leveledMod != null)
+                        {
+                            damage = DamageVar(damage);
+                            Projectile.damage = damage;
+
+                            GetGlobalNPC(npc).ModifyHitByProjectile(npc,
+                                Projectile,
+                                ref damage,
+                                ref knockback,
+                                ref crit,
+                                ref hitDir);
+                        }
+
                         int dmg = (int)npc.StrikeNPC(
-                             damage,
-                             projectile.knockBack,
-                             Math.Sign(Dir.X),
+                             (int)damage,
+                             knockback,
+                             hitDir,
                              crit);
 
-                        npc.GetGlobalNPC<GlobalStandNPC>().damageFromPlayerStand[projectile.owner] += Math.Min(dmg, hp);
+                        npc.GetGlobalNPC<GlobalStandNPC>().OnHitByProjectile(npc, Projectile, dmg, knockback, crit);
 
                         //projectile.StatusNPC(k);
 
                         // Network mode
                         if (Main.netMode != NetmodeID.SinglePlayer)
-                            NetMessage.SendData(MessageID.StrikeNPC, -1, -1, Terraria.Localization.NetworkText.FromLiteral(""), k, (float)damage, projectile.knockBack, Math.Sign(Dir.X), crit ? 1 : 0);
+                            NetMessage.SendData(MessageID.DamageNPC, -1, -1, Terraria.Localization.NetworkText.FromLiteral(""), k, (float)damage, Projectile.knockBack, Math.Sign(Dir.X), crit ? 1 : 0);
 
-                        pl.player.addDPS(dmg);
+                        pl.Player.addDPS(dmg);
 
                         if (npc.life <= 0 && !npc.SpawnedFromStatue && pl.StandLevel < StandoPlayer.MaxStandLevel)
                             pl.StandXP += npc.lifeMax * 0.3f;
@@ -451,14 +445,24 @@ namespace cool_jojo_stands.Projectiles.Minions
             }
         } /* End of 'Damage' function */
 
+        int DamageVar(float damage)
+        {
+            return 0;///Leveled.LeveledMain.DamageVar(damage);
+        }
+
+        GlobalNPC GetGlobalNPC(NPC npc)
+        {
+            return null;/// npc.GetGlobalNPC<Leveled.NPCs.LeveledNpcStats>();
+        }
+
         /* Stand activity function */
         public override void CheckActive()
         {
-            Player player = Main.player[projectile.owner];
+            Player player = Main.player[Projectile.owner];
             StandoPlayer pl = player.GetModPlayer<StandoPlayer>();
 
             if (pl.HaveStand)
-                projectile.timeLeft = 239;
+                Projectile.timeLeft = 239;
 
             if (pl.StandJustSpawned)
             {
@@ -467,7 +471,7 @@ namespace cool_jojo_stands.Projectiles.Minions
             }
 
             if (pl.StandSpawned && cool_jojo_stands.StandSummonHT.JustPressed || player.dead)
-                projectile.Kill();
+                Projectile.Kill();
         } /* End of 'CheckActive' function */
     } /* End of 'Stand' class */
 }

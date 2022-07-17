@@ -7,14 +7,14 @@ namespace cool_jojo_stands.Buffs
 {
     public class StarPlatinumRequiemStand : ModBuff
     {
-        public override void SetDefaults()
+        public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("You are the owner of Star Platinum Requiem");
             Description.SetDefault("This is Dolphin\n"
                 + "Special Ability: Time Stop\n"
                 + "Ability opens after level 10");
             Main.buffNoSave[Type] = false;
-            canBeCleared = false;
+            BuffID.Sets.NurseCannotRemoveDebuff[Type] = true;
             Main.buffNoTimeDisplay[Type] = true;
             Main.debuff[Type] = true;
         }

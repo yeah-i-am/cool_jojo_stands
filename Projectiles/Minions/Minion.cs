@@ -1,4 +1,5 @@
-﻿using Terraria;
+﻿using System;
+using Terraria;
 using Terraria.ModLoader;
 
 namespace cool_jojo_stands.Projectiles.Minions
@@ -10,18 +11,20 @@ namespace cool_jojo_stands.Projectiles.Minions
             try
             {
                 CheckActive();
-                Behaviour();
+                Behavior();
             }
-            catch
+            catch (Exception e)
             {
-
+                StandoPlayer.Talk("JoJo Stands Mod Error:");
+                StandoPlayer.Talk(e.Message);
+                StandoPlayer.Talk("Please send this error to developer");
             }
         }
 
         public abstract void CheckActive();
 
-        public abstract void Behaviour();
+        public abstract void Behavior();
 
-        public virtual void PostUpdate() { }
+        public virtual void Some() { }
     }
 }

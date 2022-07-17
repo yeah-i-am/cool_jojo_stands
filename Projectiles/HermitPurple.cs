@@ -23,8 +23,8 @@ namespace cool_jojo_stands.Projectiles
 
        float timer
         {
-            get => projectile.localAI[1];
-            set => projectile.localAI[1] = value;
+            get => Projectile.localAI[1];
+            set => Projectile.localAI[1] = value;
         }
 
         Vector2[] coll = new Vector2[10];
@@ -49,12 +49,12 @@ namespace cool_jojo_stands.Projectiles
 
         public override void SetDefaults()
         {
-            projectile.CloneDefaults(ProjectileID.SlimeHook);
+            Projectile.CloneDefaults(ProjectileID.SlimeHook);
         }
 
         public void SwingUpdate()
         {
-            if (projectile.ai[0] == 2)
+            if (Projectile.ai[0] == 2)
             {
                 timer += 1f / 60f;
 
@@ -62,15 +62,15 @@ namespace cool_jojo_stands.Projectiles
 
                 if (timer > 0.2f)
                 {
-                    Player player = Main.player[projectile.owner];
+                    Player player = Main.player[Projectile.owner];
 
                     if (time == 0)
                     {
-                        if ((Dir = player.Center - projectile.Center).Y > 23.9)
+                        if ((Dir = player.Center - Projectile.Center).Y > 23.9)
                         {
                             collAngle[collSize] = 239;
                             collAnglVel[collSize] = -239;
-                            coll[collSize++] = projectile.Center;
+                            coll[collSize++] = Projectile.Center;
 
                             ampl = -Math.Atan2(Dir.X, Dir.Y);
                             length = Dir.Length();
@@ -259,7 +259,7 @@ namespace cool_jojo_stands.Projectiles
             int hooksOut = 0;
 
             for (int l = 0; l < 1000; l++)
-                if (Main.projectile[l].active && Main.projectile[l].owner == Main.myPlayer && Main.projectile[l].type == projectile.type)
+                if (Main.projectile[l].active && Main.projectile[l].owner == Main.myPlayer && Main.projectile[l].type == Projectile.type)
                     hooksOut++;
 
             if (hooksOut > 2)
@@ -283,15 +283,15 @@ namespace cool_jojo_stands.Projectiles
             speed = 24f;
         }
 
-        public override bool PreDrawExtras(SpriteBatch spriteBatch)
+        public override bool PreDrawExtras()
         {
-            spriteBatch.End();
-            spriteBatch.Begin();
+            //spriteBatch.End();
+            //spriteBatch.Begin();
 
-            Texture2D texture = ModContent.GetTexture("cool_jojo_stands/Projectiles/HermitPurple_Chain");
+            Texture2D texture = ModContent.Request<Texture2D>("cool_jojo_stands/Projectiles/HermitPurple_Chain").Value;
 
-            Vector2 position = projectile.Center;
-            Vector2 mountedCenter = Main.player[projectile.owner].MountedCenter;
+            Vector2 position = Projectile.Center;
+            Vector2 mountedCenter = Main.player[Projectile.owner].MountedCenter;
             Microsoft.Xna.Framework.Rectangle? sourceRectangle = new Microsoft.Xna.Framework.Rectangle?();
             Vector2 origin = new Vector2((float)texture.Width * 0.5f, (float)texture.Height * 0.5f);
             float num1 = (float)texture.Height;
@@ -318,8 +318,8 @@ namespace cool_jojo_stands.Projectiles
                     position += vector2_1 * num1;
                     vector2_4 = mountedCenter - position;
                     Microsoft.Xna.Framework.Color color2 = Lighting.GetColor((int)position.X / 16, (int)((double)position.Y / 16.0));
-                    color2 = projectile.GetAlpha(color2);
-                    spriteBatch.Draw(texture, position - Main.screenPosition, sourceRectangle, color2, rotation, origin, 1f, SpriteEffects.None, 0.0f);
+                    color2 = Projectile.GetAlpha(color2);
+                    Main.EntitySpriteDraw(texture, position - Main.screenPosition, sourceRectangle, color2, rotation, origin, 1f, SpriteEffects.None, 0);
                 }
             }
 
@@ -330,7 +330,7 @@ namespace cool_jojo_stands.Projectiles
                 if (collSize - i > 1)
                     mountedCenter = coll[i + 1];
                 else
-                    mountedCenter = Main.player[projectile.owner].MountedCenter;
+                    mountedCenter = Main.player[Projectile.owner].MountedCenter;
 
                 sourceRectangle = new Microsoft.Xna.Framework.Rectangle?();
                 origin = new Vector2((float)texture.Width * 0.5f, (float)texture.Height * 0.5f);
@@ -358,8 +358,8 @@ namespace cool_jojo_stands.Projectiles
                         position += vector2_1 * num1;
                         vector2_4 = mountedCenter - position;
                         Microsoft.Xna.Framework.Color color2 = Lighting.GetColor((int)position.X / 16, (int)((double)position.Y / 16.0));
-                        color2 = projectile.GetAlpha(color2);
-                        spriteBatch.Draw(texture, position - Main.screenPosition, sourceRectangle, color2, rotation, origin, 1f, SpriteEffects.None, 0.0f);
+                        color2 = Projectile.GetAlpha(color2);
+                        Main.EntitySpriteDraw(texture, position - Main.screenPosition, sourceRectangle, color2, rotation, origin, 1f, SpriteEffects.None, 0);
                     }
                 }
             }

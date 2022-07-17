@@ -15,28 +15,27 @@ namespace cool_jojo_stands.Items.Armor
 
         public override void SetDefaults()
         {
-            item.width = 18;
-            item.height = 18;
-            item.value = Item.buyPrice(0, 3, 47, 0);
-            item.rare = ItemRarityID.LightPurple;
-            item.defense = 6;
+            Item.width = 18;
+            Item.height = 18;
+            Item.value = Item.buyPrice(0, 3, 47, 0);
+            Item.rare = ItemRarityID.LightPurple;
+            Item.defense = 6;
         }
 
         public override void UpdateEquip(Player player)
         {
             player.moveSpeed *= 1.05f;
-            player.meleeDamage *= 1.1f;
+            player.GetDamage(DamageClass.Melee) *= 1.1f;
         }
 
         public override void AddRecipes()
         {
-            ModRecipe recipe = new ModRecipe(mod);
+            Recipe recipe = CreateRecipe();
             recipe.AddIngredient(ItemID.Silk, 22);
             recipe.AddIngredient(ItemID.Hay, 18);
-            recipe.AddIngredient(ItemID.LightningBoots, 13);
+            recipe.AddIngredient(ItemID.HellstoneBar, 13);
             recipe.AddTile(TileID.Anvils);
-            recipe.SetResult(this);
-            recipe.AddRecipe();
+            recipe.Register();
         }
     }
 }

@@ -14,17 +14,17 @@ namespace cool_jojo_stands.Items
             DisplayName.SetDefault("Strange ore");
             Tooltip.SetDefault("Smells like space");
 
-            Main.RegisterItemAnimation(item.type, new Terraria.DataStructures.DrawAnimationVertical(12, 4));
+            Main.RegisterItemAnimation(Item.type, new Terraria.DataStructures.DrawAnimationVertical(12, 4));
         }
 
         public override void SetDefaults()
         {
-            item.width = 16;
-            item.height = 18;
-            item.maxStack = 999;
-            item.material = true;
-            item.rare = ItemRarityID.Expert;
-            item.value = Item.buyPrice(0, 0, 1, 0);
+            Item.width = 16;
+            Item.height = 18;
+            Item.maxStack = 999;
+            Item.material = true;
+            Item.rare = ItemRarityID.Expert;
+            Item.value = Item.buyPrice(0, 0, 1, 0);
         }
     }
 }

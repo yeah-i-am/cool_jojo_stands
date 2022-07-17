@@ -18,17 +18,17 @@ namespace cool_jojo_stands.Items
         }
         public override void SetDefaults()
         {
-            item.noMelee = true;
-            item.width = 40;
-            item.height = 40;
-            item.useTime = 47;
-            item.useAnimation = 47;
-            item.useStyle = ItemUseStyleID.HoldingUp;
-            item.value = Item.buyPrice(0, 0, 0, 47);
-            item.rare = ItemRarityID.Purple;
-            item.expert = true;
-            item.UseSound = SoundID.NPCDeath1;
-            item.consumable = true;
+            Item.noMelee = true;
+            Item.width = 40;
+            Item.height = 40;
+            Item.useTime = 47;
+            Item.useAnimation = 47;
+            Item.useStyle = ItemUseStyleID.HoldUp;
+            Item.value = Item.buyPrice(0, 0, 0, 47);
+            Item.rare = ItemRarityID.Purple;
+            Item.expert = true;
+            Item.UseSound = SoundID.NPCDeath1;
+            Item.consumable = true;
         }
 
         public override void AddRecipes()
@@ -40,7 +40,7 @@ namespace cool_jojo_stands.Items
             ///recipe.AddRecipe();
         }
 
-        public override bool UseItem(Player player)
+        public override bool? UseItem(Player player)
         {
             StandoPlayer.Talk("Well. The mod is closed. There will be no new updates, but thanks for playing with it.");
 

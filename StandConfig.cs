@@ -24,7 +24,7 @@ namespace cool_jojo_stands
 
         public override void OnLoaded()
         {
-            cool_jojo_stands.StandClientConfig = this;
+            StandModSystem.StandClientConfig = this;
         }
 
         [Header("UI Settings")]

@@ -10,21 +10,21 @@ namespace cool_jojo_stands.Projectiles
     {
         public override void SetDefaults()
         {
-            projectile.width = 40;
-            projectile.height = 40;
-            projectile.friendly = true;
-            projectile.penetrate = -1;
-            projectile.tileCollide = false;
-            projectile.timeLeft = 40;
+            Projectile.width = 40;
+            Projectile.height = 40;
+            Projectile.friendly = true;
+            Projectile.penetrate = -1;
+            Projectile.tileCollide = false;
+            Projectile.timeLeft = 40;
         }
 
         public override void AI()
         {
-            Player player = Main.player[projectile.owner];
+            Player player = Main.player[Projectile.owner];
 
-            projectile.velocity = new Vector2(0f, -1f);
+            Projectile.velocity = new Vector2(0f, -1f);
 
-            projectile.alpha += 255 / 40;
+            Projectile.alpha += 255 / 40;
         }
     }
 }

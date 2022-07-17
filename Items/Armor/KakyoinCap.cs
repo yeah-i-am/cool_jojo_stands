@@ -16,11 +16,11 @@ namespace cool_jojo_stands.Items.Armor
 
         public override void SetDefaults()
         {
-            item.width = 18;
-            item.height = 18;
-            item.value = Item.buyPrice(0, 3, 47, 0);
-            item.rare = ItemRarityID.LightPurple;
-            item.defense = 6;
+            Item.width = 18;
+            Item.height = 18;
+            Item.value = Item.buyPrice(0, 3, 47, 0);
+            Item.rare = ItemRarityID.LightPurple;
+            Item.defense = 6;
         }
 
         public override bool IsArmorSet(Item head, Item body, Item legs)
@@ -38,13 +38,12 @@ namespace cool_jojo_stands.Items.Armor
 
         public override void AddRecipes()
         {
-            ModRecipe recipe = new ModRecipe(mod);
+            Recipe recipe = CreateRecipe();
             recipe.AddIngredient(ItemID.Silk, 20);
             recipe.AddIngredient(ItemID.PinkGel, 4);
             recipe.AddIngredient(ItemID.Ruby, 1);
             recipe.AddTile(TileID.Anvils);
-            recipe.SetResult(this);
-            recipe.AddRecipe();
+            recipe.Register();
         }
     }
 }

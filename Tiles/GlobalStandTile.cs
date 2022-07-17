@@ -4,6 +4,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using cool_jojo_stands.Items;
+using Terraria.DataStructures;
 
 namespace cool_jojo_stands.Tiles
 {
@@ -15,7 +16,7 @@ namespace cool_jojo_stands.Tiles
         {
             if (type == TileID.Stone && Main.rand.NextDouble() < StrangeOreDropChance)
             {
-                Item.NewItem(i * 16, j * 16, 16, 16, ModContent.ItemType<StrangeOre>());
+                Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 16, 16, ModContent.ItemType<StrangeOre>());
             }
 
             return base.Drop(i, j, type);

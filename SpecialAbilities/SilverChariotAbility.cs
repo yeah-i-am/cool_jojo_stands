@@ -17,74 +17,76 @@ namespace cool_jojo_stands.SpecialAbilities
 {
     public class SilverChariotAbility : SpecialAbility
     {
-        public int User { get; private set; }
-
-        int _ghostNum;
+        public int whoAmI;
+        int ghostNum;
 
         public SilverChariotAbility()
         {
-            abilityCooldown = 1;
-            abilityTime = 1;
+            AbilityCooldown = 1;
+            AbilityTime = 1;
         }
 
         public void Init( int WhoAmI )
         {
-            User = WhoAmI;
+            whoAmI = WhoAmI;
 
-            StandoPlayer pl = Main.player[User].GetModPlayer<StandoPlayer>();
+            StandoPlayer pl = Main.player[whoAmI].GetModPlayer<StandoPlayer>();
 
-            _ghostNum = (pl.StandLevel - 10) / 10;
+            ghostNum = (pl.StandLevel - 10) / 10;
         }
 
         public override void Start()
         {
-            StandoPlayer pl = Main.player[User].GetModPlayer<StandoPlayer>();
+            StandoPlayer pl = Main.player[whoAmI].GetModPlayer<StandoPlayer>();
 
             if (pl.StandId == -1)
             {
-                _time = 0;
-                _cooldown = 0;
+                time = 0;
+                cooldown = 0;
                 return;
             }
 
             Projectile projectile = Main.projectile[pl.StandId];
 
+            projectile.alpha = 255;
+
+            if (Main.netMode == NetmodeID.Server)
+                return;
+
             // Smoke Dust spawn
             for (int i = 0; i < 50; i++)
             {
-                int dustIndex = Dust.NewDust(new Vector2(projectile.position.X, projectile.position.Y), projectile.width, projectile.height, 31, 0f, 0f, 100, default(Color), 2f);
+                int dustIndex = Dust.NewDust(new Vector2(projectile.position.X, projectile.position.Y), projectile.width, projectile.height, DustID.Smoke, 0f, 0f, 100, default(Color), 2f);
                 Main.dust[dustIndex].velocity *= 1.4f;
             }
             // Large Smoke Gore spawn
             for (int g = 0; g < 2; g++)
             {
-                int goreIndex = Gore.NewGore(projectile.Center - new Vector2(24f, 0f), default(Vector2), Main.rand.Next(61, 64), 2f);
+                int goreIndex = Gore.NewGore(projectile.GetSource_FromThis(), projectile.Center - new Vector2(24f, 0f), default(Vector2), Main.rand.Next(61, 64), 2f);
                 Main.gore[goreIndex].velocity.X = Main.gore[goreIndex].velocity.X + 1.5f;
                 Main.gore[goreIndex].velocity.Y = Main.gore[goreIndex].velocity.Y + 1.5f;
-                goreIndex = Gore.NewGore(projectile.Center - new Vector2(24f, 0f), default(Vector2), Main.rand.Next(61, 64), 2f);
+                goreIndex = Gore.NewGore(projectile.GetSource_FromThis(), projectile.Center - new Vector2(24f, 0f), default(Vector2), Main.rand.Next(61, 64), 2f);
                 Main.gore[goreIndex].velocity.X = Main.gore[goreIndex].velocity.X - 1.5f;
                 Main.gore[goreIndex].velocity.Y = Main.gore[goreIndex].velocity.Y + 1.5f;
-                goreIndex = Gore.NewGore(projectile.Center - new Vector2(24f, 0f), default(Vector2), Main.rand.Next(61, 64), 2f);
+                goreIndex = Gore.NewGore(projectile.GetSource_FromThis(), projectile.Center - new Vector2(24f, 0f), default(Vector2), Main.rand.Next(61, 64), 2f);
                 Main.gore[goreIndex].velocity.X = Main.gore[goreIndex].velocity.X + 1.5f;
                 Main.gore[goreIndex].velocity.Y = Main.gore[goreIndex].velocity.Y - 1.5f;
-                goreIndex = Gore.NewGore(projectile.Center - new Vector2(24f, 0f), default(Vector2), Main.rand.Next(61, 64), 2f);
+                goreIndex = Gore.NewGore(projectile.GetSource_FromThis(), projectile.Center - new Vector2(24f, 0f), default(Vector2), Main.rand.Next(61, 64), 2f);
                 Main.gore[goreIndex].velocity.X = Main.gore[goreIndex].velocity.X - 1.5f;
                 Main.gore[goreIndex].velocity.Y = Main.gore[goreIndex].velocity.Y - 1.5f;
             }
 
             //Silver Chariot armor spawn
-            Gore.NewGore(projectile.Center, projectile.velocity + Main.rand.NextVector2Square(-10f, 10f), cool_jojo_stands.mod.GetGoreSlot("Gores/SC/SilverChariot_Armor_Chestplate"), 1f);
-            Gore.NewGore(projectile.Center, projectile.velocity + Main.rand.NextVector2Square(-10f, 10f), cool_jojo_stands.mod.GetGoreSlot("Gores/SC/SilverChariot_Armor_Forearm"), 1f);
-            Gore.NewGore(projectile.Center, projectile.velocity + Main.rand.NextVector2Square(-10f, 10f), cool_jojo_stands.mod.GetGoreSlot("Gores/SC/SilverChariot_Armor_Forearm2"), 1f);
-            Gore.NewGore(projectile.Center, projectile.velocity + Main.rand.NextVector2Square(-10f, 10f), cool_jojo_stands.mod.GetGoreSlot("Gores/SC/SilverChariot_Armor_Legs"), 1f);
-            Gore.NewGore(projectile.Center, projectile.velocity + Main.rand.NextVector2Square(-10f, 10f), cool_jojo_stands.mod.GetGoreSlot("Gores/SC/SilverChariot_Armor_Neck"), 1f);
-            Gore.NewGore(projectile.Center, projectile.velocity + Main.rand.NextVector2Square(-10f, 10f), cool_jojo_stands.mod.GetGoreSlot("Gores/SC/SilverChariot_Armor_Shoulder"), 1f);
-            Gore.NewGore(projectile.Center, projectile.velocity + Main.rand.NextVector2Square(-10f, 10f), cool_jojo_stands.mod.GetGoreSlot("Gores/SC/SilverChariot_Armor_Shoulder2"), 1f);
-            Gore.NewGore(projectile.Center, projectile.velocity + Main.rand.NextVector2Square(-10f, 10f), cool_jojo_stands.mod.GetGoreSlot("Gores/SC/SilverChariot_Armor_Stomach"), 1f);
-            Gore.NewGore(projectile.Center, projectile.velocity + Main.rand.NextVector2Square(-10f, 10f), cool_jojo_stands.mod.GetGoreSlot("Gores/SC/SilverChariot_Armor_Wires"), 1f);
-            Gore.NewGore(projectile.Center, projectile.velocity + Main.rand.NextVector2Square(-10f, 10f), cool_jojo_stands.mod.GetGoreSlot("Gores/SC/SilverChariot_Armor_Helmet"), 1f);
-
-            projectile.alpha = 255;
+            Gore.NewGore(projectile.GetSource_FromThis(), projectile.Center, projectile.velocity + Main.rand.NextVector2Square(-10f, 10f), cool_jojo_stands.mod.Find<ModGore>("Gores/SC/SilverChariot_Armor_Chestplate").Type, 1f);
+            Gore.NewGore(projectile.GetSource_FromThis(), projectile.Center, projectile.velocity + Main.rand.NextVector2Square(-10f, 10f), cool_jojo_stands.mod.Find<ModGore>("Gores/SC/SilverChariot_Armor_Forearm").Type, 1f);
+            Gore.NewGore(projectile.GetSource_FromThis(), projectile.Center, projectile.velocity + Main.rand.NextVector2Square(-10f, 10f), cool_jojo_stands.mod.Find<ModGore>("Gores/SC/SilverChariot_Armor_Forearm2").Type, 1f);
+            Gore.NewGore(projectile.GetSource_FromThis(), projectile.Center, projectile.velocity + Main.rand.NextVector2Square(-10f, 10f), cool_jojo_stands.mod.Find<ModGore>("Gores/SC/SilverChariot_Armor_Legs").Type, 1f);
+            Gore.NewGore(projectile.GetSource_FromThis(), projectile.Center, projectile.velocity + Main.rand.NextVector2Square(-10f, 10f), cool_jojo_stands.mod.Find<ModGore>("Gores/SC/SilverChariot_Armor_Neck").Type, 1f);
+            Gore.NewGore(projectile.GetSource_FromThis(), projectile.Center, projectile.velocity + Main.rand.NextVector2Square(-10f, 10f), cool_jojo_stands.mod.Find<ModGore>("Gores/SC/SilverChariot_Armor_Shoulder").Type, 1f);
+            Gore.NewGore(projectile.GetSource_FromThis(), projectile.Center, projectile.velocity + Main.rand.NextVector2Square(-10f, 10f), cool_jojo_stands.mod.Find<ModGore>("Gores/SC/SilverChariot_Armor_Shoulder2").Type, 1f);
+            Gore.NewGore(projectile.GetSource_FromThis(), projectile.Center, projectile.velocity + Main.rand.NextVector2Square(-10f, 10f), cool_jojo_stands.mod.Find<ModGore>("Gores/SC/SilverChariot_Armor_Stomach").Type, 1f);
+            Gore.NewGore(projectile.GetSource_FromThis(), projectile.Center, projectile.velocity + Main.rand.NextVector2Square(-10f, 10f), cool_jojo_stands.mod.Find<ModGore>("Gores/SC/SilverChariot_Armor_Wires").Type, 1f);
+            Gore.NewGore(projectile.GetSource_FromThis(), projectile.Center, projectile.velocity + Main.rand.NextVector2Square(-10f, 10f), cool_jojo_stands.mod.Find<ModGore>("Gores/SC/SilverChariot_Armor_Helmet").Type, 1f);
         }
     }
 }

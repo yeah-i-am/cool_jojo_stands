@@ -14,7 +14,7 @@ namespace cool_jojo_stands.Utils
     public abstract class CutScene
     {
         public Vector2 camPos, camZoom, camVel;
-        public string shaderName = "StdCutScene", shaderDir = "Effects/StdCutScene";
+        public string shaderName = "StdCutScene", shaderDir = "cool_jojo_stands/Effects/StdCutScene";
         public EffectPriority effectPriority = EffectPriority.VeryHigh;
         public string key;
         public float progress;
@@ -23,7 +23,7 @@ namespace cool_jojo_stands.Utils
         {
             if (!Main.dedServ)
             {
-                Ref<Effect> screenRef = new Ref<Effect>(cool_jojo_stands.mod.GetEffect(shaderDir));
+                Ref<Effect> screenRef = new Ref<Effect>(ModContent.Request<Effect>(shaderDir, ReLogic.Content.AssetRequestMode.ImmediateLoad).Value);
 
                 Filters.Scene[shaderName] = new Filter(new ScreenShaderData(screenRef, shaderName), effectPriority);
                 Filters.Scene[shaderName].Load();

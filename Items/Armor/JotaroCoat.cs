@@ -18,15 +18,16 @@ namespace cool_jojo_stands.Items.Armor
             base.SetStaticDefaults();
             DisplayName.SetDefault("Jotaro Coat");
             Tooltip.SetDefault("Looks like school uniform");
+            ArmorIDs.Body.Sets.HidesHands[Item.bodySlot] = false;
         }
 
         public override void SetDefaults()
         {
-            item.width = 18;
-            item.height = 14;
-            item.value = Item.buyPrice(0, 3, 47, 0);
-            item.rare = ItemRarityID.LightPurple;
-            item.defense = 7;
+            Item.width = 18;
+            Item.height = 14;
+            Item.value = Item.buyPrice(0, 3, 47, 0);
+            Item.rare = ItemRarityID.LightPurple;
+            Item.defense = 7;
         }
 
         public override void DrawArmorColor(Player drawPlayer, float shadow, ref Color color, ref int glowMask, ref Color glowMaskColor)
@@ -34,22 +35,15 @@ namespace cool_jojo_stands.Items.Armor
             base.DrawArmorColor(drawPlayer, shadow, ref color, ref glowMask, ref glowMaskColor);
         }
 
-        public override void DrawHands(ref bool drawHands, ref bool drawArms)
-        {
-            drawHands = true;
-            drawArms = true;
-        }
-
         public override void AddRecipes()
         {
-            ModRecipe recipe = new ModRecipe(mod);
+            Recipe recipe = CreateRecipe();
             recipe.AddIngredient(ItemID.Silk, 24);
             recipe.AddRecipeGroup("CoolJoJoStands:GoldOrPlatinum", 13);
             recipe.AddIngredient(ItemID.Obsidian, 15);
             recipe.AddIngredient(ItemID.FallenStar, 1);
             recipe.AddTile(TileID.Anvils);
-            recipe.SetResult(this);
-            recipe.AddRecipe();
+            recipe.Register();
         }
     }
 }

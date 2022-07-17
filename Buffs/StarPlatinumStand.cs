@@ -8,14 +8,14 @@ namespace cool_jojo_stands.Buffs
 {
     public class StarPlatinumStand : ModBuff
     {
-        public override void SetDefaults()
+        public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("You are the owner of Star Platinum");
             Description.SetDefault("This is melee stand, very fast\n"
                 + "Special Ability: Time Stop\n"
                 + "Ability opens after level 40");
             Main.buffNoSave[Type] = false;
-            canBeCleared = false;
+            BuffID.Sets.NurseCannotRemoveDebuff[Type] = true;
             Main.buffNoTimeDisplay[Type] = true;
             Main.debuff[Type] = true;
         }
@@ -24,19 +24,19 @@ namespace cool_jojo_stands.Buffs
         {
             StandoPlayer StandPlayer = player.GetModPlayer<StandoPlayer>();
 
-            if (StandPlayer.Stand != StandType.StarPlatinum)
+            if (!StandPlayer.HaveStarPlatinum)
             {
-                StandPlayer.Stand = StandType.StarPlatinum;
+                StandPlayer.HaveStarPlatinum = true;
                 StandPlayer.HaveStand = true;
                 StandPlayer.StandBuffName = "StarPlatinum";
             }
 
-            player.buffTime[buffIndex] = 32767;
+            player.buffTime[buffIndex] = 2390;
         }
 
         public override void ModifyBuffTip(ref string tip, ref int rare)
         {
-            rare = ItemRarityID.Expert;
+            rare = ItemRarityID.Purple;
         }
     }
 }

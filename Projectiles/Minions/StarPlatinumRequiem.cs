@@ -38,28 +38,28 @@ namespace cool_jojo_stands.Projectiles.Minions
          *****************/
         public override void SetStaticDefaults()
         {
-            Main.projFrames[projectile.type] = 12;
+            Main.projFrames[Projectile.type] = 12;
             DisplayName.SetDefault("Star Platinum Requiem");
-            Main.projPet[projectile.type] = true;
+            Main.projPet[Projectile.type] = true;
         }
 
         public override void SetDefaults()
         {
-            projectile.netImportant = true;
-            projectile.width = 92;
-            projectile.height = 92;
-            projectile.friendly = true;
-            projectile.penetrate = -1;
-            projectile.timeLeft = 239;
-            projectile.tileCollide = false;
-            projectile.melee = true;
-            projectile.ignoreWater = true;
-            projectile.alpha = 255;
+            Projectile.netImportant = true;
+            Projectile.width = 92;
+            Projectile.height = 92;
+            Projectile.friendly = true;
+            Projectile.penetrate = -1;
+            Projectile.timeLeft = 239;
+            Projectile.tileCollide = false;
+            Projectile.DamageType = DamageClass.Melee;
+            Projectile.ignoreWater = true;
+            Projectile.alpha = 255;
 
             Shoot = ModContent.ProjectileType<Dolphin>();
         }
 
-        public override bool CanDamage() => false;
+        public override bool? CanDamage() => false;
         public override bool? CanCutTiles() => false;
         public override bool? CanHitNPC(NPC target) => false;
         public override bool MinionContactDamage() => false;
@@ -67,37 +67,37 @@ namespace cool_jojo_stands.Projectiles.Minions
         /* Select animation frame function */
         public override void SelectFrame()
         {
-            if (projectile.alpha > 30)
-                projectile.alpha -= 8;
+            if (Projectile.alpha > 30)
+                Projectile.alpha -= 8;
 
-            StandoPlayer pl = Main.player[projectile.owner].GetModPlayer<StandoPlayer>();
+            StandoPlayer pl = Main.player[Projectile.owner].GetModPlayer<StandoPlayer>();
 
-            projectile.frameCounter++;
+            Projectile.frameCounter++;
             glistFrameCounter++;
 
-            if (StandHaveTarget && projectile.frameCounter >= 5)
+            if (StandHaveTarget && Projectile.frameCounter >= 5)
             {
-                if (projectile.frame < 8)
-                    projectile.frame++;
+                if (Projectile.frame < 8)
+                    Projectile.frame++;
                 else
-                    projectile.frame = 8 + (projectile.frame + 1) % 4;
+                    Projectile.frame = 8 + (Projectile.frame + 1) % 4;
 
-                projectile.frameCounter = 0;
+                Projectile.frameCounter = 0;
             }
-            else if (projectile.frame > 3 && projectile.frameCounter >= 5)
+            else if (Projectile.frame > 3 && Projectile.frameCounter >= 5)
             {
-                if (projectile.frame <= 8)
-                    projectile.frame--;
+                if (Projectile.frame <= 8)
+                    Projectile.frame--;
                 else
-                    projectile.frame = 8 + (projectile.frame + 1) % 4;
+                    Projectile.frame = 8 + (Projectile.frame + 1) % 4;
 
-                projectile.frameCounter = 0;
+                Projectile.frameCounter = 0;
 
             }
-            else if (projectile.frameCounter >= 10)
+            else if (Projectile.frameCounter >= 10)
             {
-                projectile.frameCounter = 0;
-                projectile.frame = (projectile.frame + 1) % 4;
+                Projectile.frameCounter = 0;
+                Projectile.frame = (Projectile.frame + 1) % 4;
             }
 
             if (GlistHaveTarget && glistFrameCounter > 5)
@@ -114,35 +114,35 @@ namespace cool_jojo_stands.Projectiles.Minions
 
         private void DrawGlist( string type, Color lightColor )
         {
-            Texture2D texture = ModContent.GetTexture("cool_jojo_stands/Projectiles/Minions/StarPlatinumRequiem_Glist" + type);
+            Texture2D texture = ModContent.Request<Texture2D>("cool_jojo_stands/Projectiles/Minions/StarPlatinumRequiem_Glist" + type).Value;
 
-            Vector2 position = projectile.Center;
+            Vector2 position = Projectile.Center;
             Microsoft.Xna.Framework.Rectangle? sourceRectangle =
                 new Microsoft.Xna.Framework.Rectangle?(new Rectangle(0, 92 * GlistFrame, 92, 92));
             Vector2 origin = new Vector2(46f, 46f);
-            Vector2 mountedCenter = Main.player[projectile.owner].MountedCenter;
+            Vector2 mountedCenter = Main.player[Projectile.owner].MountedCenter;
 
-            Main.spriteBatch.Draw(texture, position - Main.screenPosition, sourceRectangle, lightColor, 0f, origin, 1f, (projectile.spriteDirection == -1) ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.0f);
+            Main.spriteBatch.Draw(texture, position - Main.screenPosition, sourceRectangle, lightColor, 0f, origin, 1f, (Projectile.spriteDirection == -1) ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.0f);
         }
 
-        public override bool PreDraw(SpriteBatch spriteBatch, Color lightColor)
+        public override bool PreDraw(ref Color lightColor)
         {
             DrawGlist("Left", lightColor);
 
-            if (projectile.frame < 8)
+            if (Projectile.frame < 8)
                 return true;
 
             /* Left arm */
-            Texture2D texture = ModContent.GetTexture("cool_jojo_stands/Projectiles/Minions/StarPlatinumRequiem_ArmLeft");
+            Texture2D texture = ModContent.Request<Texture2D>("cool_jojo_stands/Projectiles/Minions/StarPlatinumRequiem_ArmLeft").Value;
 
             Vector2 position;
             Microsoft.Xna.Framework.Rectangle? sourceRectangle = new Microsoft.Xna.Framework.Rectangle?();
             Vector2 origin;
             float rotation;
 
-            if (projectile.spriteDirection == -1)
+            if (Projectile.spriteDirection == -1)
             {
-                position = projectile.Center - new Vector2(-16f, -3f);
+                position = Projectile.Center - new Vector2(-16f, -3f);
                 origin = new Vector2((float)texture.Width * 0.70f, (float)texture.Height * 0.55f);
                 rotation = attackAngle - (float)Math.PI * Math.Sign(attackAngle);
                 rotation = (rotation > invMaxAttackAngle) ? invMaxAttackAngle :
@@ -150,38 +150,38 @@ namespace cool_jojo_stands.Projectiles.Minions
             }
             else
             {
-                position = projectile.Center - new Vector2(16f, -3f);
+                position = Projectile.Center - new Vector2(16f, -3f);
                 origin = new Vector2((float)texture.Width * 0.30f, (float)texture.Height * 0.55f);
                 rotation = (attackAngle > maxAttackAngle) ? maxAttackAngle :
                 ((attackAngle < minAttackAngle) ? minAttackAngle : attackAngle);
             }
 
-            lightColor = projectile.GetAlpha(lightColor);
+            lightColor = Projectile.GetAlpha(lightColor);
 
-            Main.spriteBatch.Draw(texture, position - Main.screenPosition, sourceRectangle, lightColor, rotation, origin, 1f, (projectile.spriteDirection == -1) ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.0f);
+            Main.spriteBatch.Draw(texture, position - Main.screenPosition, sourceRectangle, lightColor, rotation, origin, 1f, (Projectile.spriteDirection == -1) ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.0f);
 
             return true;
         }
 
-        public override void PostDraw(SpriteBatch spriteBatch, Color lightColor)
+        public override void PostDraw(Color lightColor)
         {
             DrawGlist("Right", lightColor);
 
-            if (projectile.frame < 8)
+            if (Projectile.frame < 8)
                 return;
 
             /* Right arm */
-            Texture2D texture = ModContent.GetTexture("cool_jojo_stands/Projectiles/Minions/StarPlatinumRequiem_ArmRight");
+            Texture2D texture = ModContent.Request<Texture2D>("cool_jojo_stands/Projectiles/Minions/StarPlatinumRequiem_ArmRight").Value;
 
             Vector2 position;
-            Vector2 mountedCenter = Main.player[projectile.owner].MountedCenter;
+            Vector2 mountedCenter = Main.player[Projectile.owner].MountedCenter;
             Microsoft.Xna.Framework.Rectangle? sourceRectangle = new Microsoft.Xna.Framework.Rectangle?();
             Vector2 origin;
             float rotation;
 
-            if (projectile.spriteDirection == -1)
+            if (Projectile.spriteDirection == -1)
             {
-                position = projectile.Center - new Vector2(-15f, 2f);
+                position = Projectile.Center - new Vector2(-15f, 2f);
                 origin = new Vector2((float)texture.Width * 0.70f, (float)texture.Height * 0.45f);
                 rotation = attackAngle - (float)Math.PI * Math.Sign(attackAngle);
                 rotation = (rotation > invMaxAttackAngle) ? invMaxAttackAngle :
@@ -189,27 +189,27 @@ namespace cool_jojo_stands.Projectiles.Minions
             }
             else
             {
-                position = projectile.Center - new Vector2(15f, 2f);
+                position = Projectile.Center - new Vector2(15f, 2f);
                 origin = new Vector2((float)texture.Width * 0.30f, (float)texture.Height * 0.45f);
                 rotation = (attackAngle > maxAttackAngle) ? maxAttackAngle :
                 ((attackAngle < minAttackAngle) ? minAttackAngle : attackAngle);
             }
 
-            lightColor = projectile.GetAlpha(lightColor);
+            lightColor = Projectile.GetAlpha(lightColor);
 
-            Main.spriteBatch.Draw(texture, position - Main.screenPosition, sourceRectangle, lightColor, rotation, origin, 1f, (projectile.spriteDirection == -1) ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.0f);
+            Main.spriteBatch.Draw(texture, position - Main.screenPosition, sourceRectangle, lightColor, rotation, origin, 1f, (Projectile.spriteDirection == -1) ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.0f);
 
             /* Scapular */
-            texture = ModContent.GetTexture("cool_jojo_stands/Projectiles/Minions/StarPlatinumRequiem_Scapular");
+            texture = ModContent.Request<Texture2D>("cool_jojo_stands/Projectiles/Minions/StarPlatinumRequiem_Scapular").Value;
 
-            position = projectile.Center;
-            mountedCenter = Main.player[projectile.owner].MountedCenter;
+            position = Projectile.Center;
+            mountedCenter = Main.player[Projectile.owner].MountedCenter;
             sourceRectangle = new Microsoft.Xna.Framework.Rectangle?();
             origin = new Vector2((float)texture.Width * 0.5f, (float)texture.Height * 0.5f);
 
-            lightColor = projectile.GetAlpha(lightColor);
+            lightColor = Projectile.GetAlpha(lightColor);
 
-            Main.spriteBatch.Draw(texture, position - Main.screenPosition, sourceRectangle, lightColor, 0f, origin, 1f, (projectile.spriteDirection == -1) ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.0f);
+            Main.spriteBatch.Draw(texture, position - Main.screenPosition, sourceRectangle, lightColor, 0f, origin, 1f, (Projectile.spriteDirection == -1) ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0.0f);
 
             return;
         }
@@ -217,7 +217,7 @@ namespace cool_jojo_stands.Projectiles.Minions
         /* Star Platinum Requiem dust function */
         public override void CreateDust()
         {
-            Lighting.AddLight(projectile.Center, 0.7f, 0f, 0.7f);
+            Lighting.AddLight(Projectile.Center, 0.7f, 0f, 0.7f);
         }
 
         public override void BehavourStart()
@@ -232,13 +232,13 @@ namespace cool_jojo_stands.Projectiles.Minions
             StandHaveTarget = true;
 
             float DistToPlayer = Vector2.Distance(Main.MouseWorld, player.Center);
-            trgDir = Main.MouseWorld - projectile.Center;
+            trgDir = Main.MouseWorld - Projectile.Center;
 
             if (Main.mouseRight)
             {
                 targetPos = Main.MouseWorld;
-                standPos = projectile.position;
-                trgDir = targetPos - projectile.Center;
+                standPos = Projectile.position;
+                trgDir = targetPos - Projectile.Center;
                 attackAngle = (float)Math.Atan2(trgDir.Y, trgDir.X);
                 attacking = true;
             }
@@ -251,7 +251,7 @@ namespace cool_jojo_stands.Projectiles.Minions
             else
                 standPos = Main.MouseWorld;
 
-            targetDist = Vector2.Distance(standPos, projectile.Center);
+            targetDist = Vector2.Distance(standPos, Projectile.Center);
         }
 
         public override void ChaseNPCFar()
@@ -260,8 +260,8 @@ namespace cool_jojo_stands.Projectiles.Minions
             {
                 NPC npc = Main.npc[player.MinionAttackTargetNPC];
 
-                targetDist = Vector2.Distance(npc.Center, projectile.Center);
-                trgDir = npc.Center - projectile.Center;
+                targetDist = Vector2.Distance(npc.Center, Projectile.Center);
+                trgDir = npc.Center - Projectile.Center;
                 attackAngle = (float)Math.Atan2(trgDir.Y, trgDir.X);
                 trgDir.Y = 0;
                 trgDir.X = Math.Sign(trgDir.X);
@@ -282,8 +282,8 @@ namespace cool_jojo_stands.Projectiles.Minions
 
                     if (!player.HasMinionAttackTargetNPC && distance < targetDist)
                     {
-                        targetDist = Vector2.Distance(npc.Center, projectile.Center);
-                        trgDir = npc.Center - projectile.Center;
+                        targetDist = Vector2.Distance(npc.Center, Projectile.Center);
+                        trgDir = npc.Center - Projectile.Center;
                         attackAngle = (float)Math.Atan2(trgDir.Y, trgDir.X);
                         trgDir.X = Math.Sign(trgDir.X);
                         targetPos = npc.Center;
@@ -330,7 +330,7 @@ namespace cool_jojo_stands.Projectiles.Minions
                         Direction = Vector2.Zero;
                     else
                     {
-                        Direction = standPos - projectile.Center;
+                        Direction = standPos - Projectile.Center;
                         Direction.Normalize();
                     }
 
@@ -367,11 +367,11 @@ namespace cool_jojo_stands.Projectiles.Minions
                 Vector2 l = new Vector2(1, 0);
                 l = l.RotatedBy(attackAngle);
 
-                Vector2 ShootPos = projectile.Center + l * 50;
+                Vector2 ShootPos = Projectile.Center + l * 50;
 
                 Vector2 ShootV = l * ShootVel;
 
-                Projectile.NewProjectile(ShootPos.X, ShootPos.Y, ShootV.X, ShootV.Y, Shoot, projectile.damage, projectile.knockBack, projectile.owner, 0f, 1f);
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), ShootPos.X, ShootPos.Y, ShootV.X, ShootV.Y, Shoot, Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, 1f);
             }
 
             if (GlistHaveTarget)
@@ -381,24 +381,24 @@ namespace cool_jojo_stands.Projectiles.Minions
                 {
                     GlistAttacked = false;
 
-                    Vector2 ShootPos = projectile.Center + new Vector2(25f * NewDirection, -15f);
+                    Vector2 ShootPos = Projectile.Center + new Vector2(25f * NewDirection, -15f);
                     Vector2 D = new Vector2(NewDirection, 0);
 
                     Vector2 ShootV = D * ShootVel;
 
-                    Projectile.NewProjectile(ShootPos.X, ShootPos.Y, ShootV.X, ShootV.Y, Shoot, projectile.damage, projectile.knockBack, projectile.owner, 0f, 0f);
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), ShootPos.X, ShootPos.Y, ShootV.X, ShootV.Y, Shoot, Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, 0f);
                 }
                 /* Right attack */
                 else if (GlistFrame == 6 && !GlistAttacked)
                 {
                     GlistAttacked = true;
 
-                    Vector2 ShootPos = projectile.Center + new Vector2(0f, -17f);
+                    Vector2 ShootPos = Projectile.Center + new Vector2(0f, -17f);
                     Vector2 D = new Vector2(NewDirection, 0);
 
                     Vector2 ShootV = D * ShootVel;
 
-                    Projectile.NewProjectile(ShootPos.X, ShootPos.Y, ShootV.X, ShootV.Y, Shoot, projectile.damage, projectile.knockBack, projectile.owner, 0f, 0f);
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), ShootPos.X, ShootPos.Y, ShootV.X, ShootV.Y, Shoot, Projectile.damage, Projectile.knockBack, Projectile.owner, 0f, 0f);
                 }
             }
 
@@ -409,7 +409,7 @@ namespace cool_jojo_stands.Projectiles.Minions
         /* Stand kill function */
         public override void Kill(int timeLeft)
         {
-            Player player = Main.player[projectile.owner];
+            Player player = Main.player[Projectile.owner];
             StandoPlayer pl = player.GetModPlayer<StandoPlayer>();
             pl.StandSpawned = false;
         }

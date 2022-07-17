@@ -7,13 +7,13 @@ namespace cool_jojo_stands.Buffs
 {
     public class MagicianRedStand : ModBuff
     {
-        public override void SetDefaults()
+        public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("You are the owner of Magician Red");
             Description.SetDefault("This is fire stand, very hot\n"
                 + "Special Ability: None");
             Main.buffNoSave[Type] = false; // false
-            canBeCleared = false;
+            BuffID.Sets.NurseCannotRemoveDebuff[Type] = true;
             Main.buffNoTimeDisplay[Type] = true;
             Main.debuff[Type] = true;
         }
@@ -22,19 +22,19 @@ namespace cool_jojo_stands.Buffs
         {
             StandoPlayer StandPlayer = player.GetModPlayer<StandoPlayer>();
 
-            if (StandPlayer.Stand != StandType.SilverChariot)
+            if (!StandPlayer.HaveMagicianRedStand)
             {
-                StandPlayer.Stand = StandType.SilverChariot;
+                StandPlayer.HaveMagicianRedStand = true;
                 StandPlayer.HaveStand = true;
                 StandPlayer.StandBuffName = "MagicianRed";
             }
 
-            player.buffTime[buffIndex] = 32767;
+            player.buffTime[buffIndex] = 2390;
         }
 
         public override void ModifyBuffTip(ref string tip, ref int rare)
         {
-            rare = ItemRarityID.Expert;
+            rare = ItemRarityID.Red;
         }
     }
 }

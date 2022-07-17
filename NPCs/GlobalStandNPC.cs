@@ -26,16 +26,25 @@ namespace cool_jojo_stands.NPCs
             else
                 damageFromPlayer[projectile.owner] += Math.Min(damage, npc.life + damage);
 
-            if (npc.life <= 0)
-                Main.player[Main.myPlayer].GetModPlayer<StandoPlayer>().NPCDeadGetXP(npc);
+            ///if (npc.life <= 0)
+            ///    Main.player[Main.myPlayer].GetModPlayer<StandoPlayer>().NPCDeadGetXP(npc);
         }
 
         public override void OnHitByItem(NPC npc, Player player, Item item, int damage, float knockback, bool crit)
         {
             damageFromPlayer[player.whoAmI] += Math.Min(damage, npc.life + damage);
 
-            if (npc.life <= 0)
+            ///if (npc.life <= 0)
+            ///    Main.player[Main.myPlayer].GetModPlayer<StandoPlayer>().NPCDeadGetXP(npc);
+        }
+        public override bool CheckDead(NPC npc)
+        {
+            bool ded = base.CheckDead(npc);
+
+            if (ded)
                 Main.player[Main.myPlayer].GetModPlayer<StandoPlayer>().NPCDeadGetXP(npc);
+
+            return ded;
         }
 
         public int DamageFromPlayer(int player) => damageFromPlayer[player];

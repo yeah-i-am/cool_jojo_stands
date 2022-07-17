@@ -1,4 +1,8 @@
-
+.vs/*
+bin/*
+*.bak*
+obj/*
+обнова.txt
 .vs/cool_jojo_stands/DesignTimeBuild/.dtbcache.v2
 .vs/cool_jojo_stands/v16/.suo
 bin/Debug/net45/cool_jojo_stands.dll

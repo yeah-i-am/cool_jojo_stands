@@ -8,23 +8,26 @@ using Terraria.Graphics.Shaders;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using ReLogic.Content;
+using Terraria.ID;
+using System.IO;
 
 namespace cool_jojo_stands
 {
     class StandUI : UIState
     {
         public UIText 
-            lvlNumText = new UIText("lvl_num", 0.9f), // Level text field
-            xpNumText = new UIText("xp_num", 0.6f);  // XP text field
+            lvlNumText = new UIText("239", 0.9f), // Level text field
+            xpNumText = new UIText("239", 0.6f);  // XP text field
 
         /* Separate elements */
         public UIPanel panel = new UIPanel();
         public UIProgressBar xpProgressBar = new UIProgressBar();
         public UIImageButton hideUiButton;
 
-        Texture2D buttonTexture;    // Hide UI button texture
+        Asset<Texture2D> buttonTexture;    // Hide UI button texture
         const float SlideSpeed = 8; // Hide UI speed
-        bool hideUI = true;       // UI hided flaq сам такой блять!!!
+        bool IsHideUI = true;       // UI hided flaq
 
         /* Initialize UI function */
         public override void OnInitialize()
@@ -71,17 +74,20 @@ namespace cool_jojo_stands
             xpProgressBar.Height.Set(2, 0);
             Append(xpProgressBar);
 
-            /* Set color of button texture */
-            CreateHideUIButtonTexture();
+            Main.QueueMainThreadAction(() =>
+            {
+                /* Set color of button texture */
+                CreateHideUIButtonTexture();
 
-            /* Create button */
-            hideUiButton = new UIImageButton(buttonTexture);
+                /* Create button */
+                hideUiButton = new UIImageButton(buttonTexture);
 
-            hideUiButton.SetVisibility(1f, 0.7f);
-            hideUiButton.OnClick += OnButtonClick;
-            Append(hideUiButton);
+                hideUiButton.SetVisibility(1f, 0.7f);
+                hideUiButton.OnClick += OnButtonClick;
+                Append(hideUiButton);
 
-            SetUIPos();
+                SetUIPos();
+            });
         }
 
         /* Update UI function */
@@ -105,10 +111,10 @@ namespace cool_jojo_stands
         /* Hide animation function */
         void HideAnimation()
         {
-            switch (cool_jojo_stands.StandClientConfig.LvlPos)
+            switch (StandModSystem.StandClientConfig.LvlPos)
             {
                 case UIPos.Right:
-                    if (hideUI && panel.Left.Pixels < 120)
+                    if (IsHideUI && panel.Left.Pixels < 120)
                     {
                         float Speed = Math.Min(120f - panel.Left.Pixels, SlideSpeed);
 
@@ -116,7 +122,7 @@ namespace cool_jojo_stands
                         xpProgressBar.Left.Pixels += Speed;
                         hideUiButton.Left.Pixels += Speed;
                     }
-                    else if (!hideUI && panel.Left.Pixels > 0)
+                    else if (!IsHideUI && panel.Left.Pixels > 0)
                     {
                         float Speed = Math.Min(panel.Left.Pixels, SlideSpeed);
 
@@ -127,7 +133,7 @@ namespace cool_jojo_stands
                     break;
 
                 case UIPos.Left:
-                    if (hideUI && panel.Left.Pixels > -120)
+                    if (IsHideUI && panel.Left.Pixels > -120)
                     {
                         float Speed = Math.Min(120f + panel.Left.Pixels, SlideSpeed);
 
@@ -135,7 +141,7 @@ namespace cool_jojo_stands
                         xpProgressBar.Left.Pixels -= Speed;
                         hideUiButton.Left.Pixels -= Speed;
                     }
-                    else if (!hideUI && panel.Left.Pixels < 0)
+                    else if (!IsHideUI && panel.Left.Pixels < 0)
                     {
                         float Speed = Math.Min(-panel.Left.Pixels, SlideSpeed);
 
@@ -146,7 +152,7 @@ namespace cool_jojo_stands
                     break;
 
                 case UIPos.Top:
-                    if (hideUI && panel.Top.Pixels > -75)
+                    if (IsHideUI && panel.Top.Pixels > -75)
                     {
                         float Speed = Math.Min(75f + panel.Top.Pixels, SlideSpeed);
 
@@ -154,7 +160,7 @@ namespace cool_jojo_stands
                         xpProgressBar.Top.Pixels -= Speed;
                         hideUiButton.Top.Pixels -= Speed;
                     }
-                    else if (!hideUI && panel.Top.Pixels < 0)
+                    else if (!IsHideUI && panel.Top.Pixels < 0)
                     {
                         float Speed = Math.Min(-panel.Top.Pixels, SlideSpeed);
 
@@ -165,7 +171,7 @@ namespace cool_jojo_stands
                     break;
 
                 case UIPos.Bottom:
-                    if (hideUI && panel.Top.Pixels < 75)
+                    if (IsHideUI && panel.Top.Pixels < 75)
                     {
                         float Speed = Math.Min(75f - panel.Top.Pixels, SlideSpeed);
 
@@ -173,7 +179,7 @@ namespace cool_jojo_stands
                         xpProgressBar.Top.Pixels += Speed;
                         hideUiButton.Top.Pixels += Speed;
                     }
-                    else if (!hideUI && panel.Top.Pixels > 0)
+                    else if (!IsHideUI && panel.Top.Pixels > 0)
                     {
                         float Speed = Math.Min(panel.Top.Pixels, SlideSpeed);
 
@@ -189,17 +195,18 @@ namespace cool_jojo_stands
         /* Processing hide UI button click function */
         private void OnButtonClick(UIMouseEvent evt, UIElement listeningElement)
         {
-            hideUI = !hideUI;
+            IsHideUI = !IsHideUI;
         }
 
         /* Create a texture for hide UI button function */
         private void CreateHideUIButtonTexture()
         {
-            buttonTexture = ModContent.GetTexture("cool_jojo_stands/Textures/button");
-            Color[] OldTextureData = new Color[buttonTexture.Height * buttonTexture.Width];
-            Color[] NewTextureData = new Color[buttonTexture.Height * buttonTexture.Width];
+            buttonTexture = ModContent.Request<Texture2D>("cool_jojo_stands/Textures/button", ReLogic.Content.AssetRequestMode.ImmediateLoad);
+            Texture2D tex = buttonTexture.Value; 
+            Color[] OldTextureData = new Color[tex.Height * tex.Width];
+            Color[] NewTextureData = new Color[tex.Height * tex.Width];
 
-            buttonTexture.GetData<Color>(OldTextureData);
+            tex.GetData<Color>(OldTextureData);
 
             for (int i = 0; i < OldTextureData.Length; i++)
             {
@@ -208,57 +215,65 @@ namespace cool_jojo_stands
                 OldTextureData[i].B = (byte)(OldTextureData[i].B * 0.6f);
             }
 
-            switch (cool_jojo_stands.StandClientConfig.LvlPos)
+            switch (StandModSystem.StandClientConfig.LvlPos)
             {
                 case UIPos.Right:
-                    buttonTexture.SetData<Color>(OldTextureData);
+                    tex.SetData<Color>(OldTextureData);
                     return;
 
                 case UIPos.Left:
-                    for (int y = 0; y < buttonTexture.Height; y++)
-                      for (int x = 0; x < buttonTexture.Width; x++)
+                    for (int y = 0; y < tex.Height; y++)
+                      for (int x = 0; x < tex.Width; x++)
                         {
-                            int OldIndex = y * buttonTexture.Width + x;
-                            int NewIndex = y * buttonTexture.Width + buttonTexture.Width - 1 - x;
+                            int OldIndex = y * tex.Width + x;
+                            int NewIndex = y * tex.Width + tex.Width - 1 - x;
 
                             NewTextureData[NewIndex] = OldTextureData[OldIndex];
                         }
                     break;
 
                 case UIPos.Bottom:
-                    buttonTexture = new Texture2D(Main.graphics.GraphicsDevice, buttonTexture.Height, buttonTexture.Width);
+                    tex = new Texture2D(Main.graphics.GraphicsDevice, tex.Height, tex.Width);
 
-                    for (int y = 0; y < buttonTexture.Height; y++)
-                        for (int x = 0; x < buttonTexture.Width; x++)
+                    for (int y = 0; y < tex.Height; y++)
+                        for (int x = 0; x < tex.Width; x++)
                         {
-                            int OldIndex = x * buttonTexture.Height + y;
-                            int NewIndex = y * buttonTexture.Width + x;
+                            int OldIndex = x * tex.Height + y;
+                            int NewIndex = y * tex.Width + x;
 
                             NewTextureData[NewIndex] = OldTextureData[OldIndex];
                         }
                     break;
 
                 case UIPos.Top:
-                    buttonTexture = new Texture2D(Main.graphics.GraphicsDevice, buttonTexture.Height, buttonTexture.Width);
+                    tex = new Texture2D(Main.graphics.GraphicsDevice, tex.Height, tex.Width);
 
-                    for (int y = 0; y < buttonTexture.Height; y++)
-                        for (int x = 0; x < buttonTexture.Width; x++)
+                    for (int y = 0; y < tex.Height; y++)
+                        for (int x = 0; x < tex.Width; x++)
                         {
-                            int OldIndex = x * buttonTexture.Height + y;
-                            int NewIndex = (buttonTexture.Height - 1 - y) * buttonTexture.Width + x;
+                            int OldIndex = x * tex.Height + y;
+                            int NewIndex = (tex.Height - 1 - y) * tex.Width + x;
 
                             NewTextureData[NewIndex] = OldTextureData[OldIndex];
                         }
                     break;
             }
 
-            buttonTexture.SetData<Color>(NewTextureData);
+            tex.SetData<Color>(NewTextureData);
+
+            MemoryStream stream = new MemoryStream();
+
+            tex.SaveAsPng(stream, tex.Width, tex.Height);
+
+            stream.Seek(0, SeekOrigin.Begin);
+
+            buttonTexture = cool_jojo_stands.mod.Assets.CreateUntracked<Texture2D>(stream, "YES.png");
         }
 
         /* Set UI position function */
         private void SetUIPos()
         {
-            switch (cool_jojo_stands.StandClientConfig.LvlPos)
+            switch (StandModSystem.StandClientConfig.LvlPos)
             {
                 case UIPos.Right:
                     panel.VAlign = 0.5f;

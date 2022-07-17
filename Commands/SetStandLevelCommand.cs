@@ -1,4 +1,4 @@
-﻿/*using System;
+﻿using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -36,11 +36,10 @@ namespace cool_jojo_stands.Commands
             pl.StandXP = 0;
             pl.StandLevel = Level;
             pl.StandNeedToUpXP = (int)(Math.Pow(pl.StandLevel, 1.4) * 3000); // New xp to level up
-            CombatText.NewText(new Rectangle((int)pl.player.position.X, (int)pl.player.position.Y, pl.player.width, pl.player.height), Color.Aquamarine, "New LVL!", true, false);
-            int proj = Projectile.NewProjectile(Main.player[Main.myPlayer].Center, new Vector2(0, -8f), ProjectileID.RocketFireworksBoxYellow, 0, 0f);
+            CombatText.NewText(new Rectangle((int)pl.Player.position.X, (int)pl.Player.position.Y, pl.Player.width, pl.Player.height), Color.Aquamarine, "New LVL!", true, false);
+            int proj = Projectile.NewProjectile(null, Main.player[Main.myPlayer].Center, new Vector2(0, -8f), ProjectileID.RocketFireworksBoxYellow, 0, 0f);
 
             Main.projectile[proj].timeLeft = 30;
         }
     }
 }
-*/

@@ -7,12 +7,12 @@ namespace cool_jojo_stands.Buffs
 {
     public class SilverChariotStand : ModBuff
     {
-        public override void SetDefaults()
+        public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("You are the owner of Silver Chariot");
             Description.SetDefault("France is next door, boy");
             Main.buffNoSave[Type] = false;
-            canBeCleared = false;
+            BuffID.Sets.NurseCannotRemoveDebuff[Type] = true;
             Main.buffNoTimeDisplay[Type] = true;
             Main.debuff[Type] = true;
         }
@@ -21,18 +21,14 @@ namespace cool_jojo_stands.Buffs
         {
             StandoPlayer StandPlayer = player.GetModPlayer<StandoPlayer>();
 
-            if (StandPlayer.Stand != StandType.SilverChariot)
+            if (!StandPlayer.HaveStarPlatinumRequiem)
             {
-                StandPlayer.Stand = StandType.SilverChariot;
+                StandPlayer.HaveSilverChariotStand = true;
                 StandPlayer.HaveStand = true;
                 StandPlayer.StandBuffName = "SilverChariot";
             }
 
-            player.buffTime[buffIndex] = 32767;
-        }
-        public override void ModifyBuffTip(ref string tip, ref int rare)
-        {
-            rare = ItemRarityID.Expert;
+            player.buffTime[buffIndex] = 2390;
         }
     }
 

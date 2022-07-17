@@ -14,26 +14,25 @@ namespace cool_jojo_stands.Items
             DisplayName.SetDefault("Strange bar");
             Tooltip.SetDefault("Smells like space");
 
-            Main.RegisterItemAnimation(item.type, new Terraria.DataStructures.DrawAnimationVertical(7, 8));
+            Main.RegisterItemAnimation(Item.type, new Terraria.DataStructures.DrawAnimationVertical(7, 8));
         }
 
         public override void SetDefaults()
         {
-            item.width = 34;
-            item.height = 30;
-            item.maxStack = 999;
-            item.material = true;
-            item.rare = ItemRarityID.Expert;
-            item.value = Item.buyPrice(0, 0, 4, 0);
+            Item.width = 34;
+            Item.height = 30;
+            Item.maxStack = 999;
+            Item.material = true;
+            Item.rare = ItemRarityID.Expert;
+            Item.value = Item.buyPrice(0, 0, 4, 0);
         }
 
         public override void AddRecipes()
         {
-            ModRecipe recipe = new ModRecipe(mod);
+            Recipe recipe = CreateRecipe();
             recipe.AddIngredient(ModContent.ItemType<StrangeOre>(), 4);
             recipe.AddTile(TileID.Furnaces);
-            recipe.SetResult(this);
-            recipe.AddRecipe();
+            recipe.Register();
         }
     }
 }

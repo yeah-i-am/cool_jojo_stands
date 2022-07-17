@@ -9,12 +9,12 @@ namespace cool_jojo_stands.Buffs
 {
     public class HermitPurpleStand : ModBuff
     {
-        public override void SetDefaults()
+        public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("You are the owner of Hermit Purple");
             Description.SetDefault("Oh...");
             Main.buffNoSave[Type] = false;
-            canBeCleared = false;
+            BuffID.Sets.NurseCannotRemoveDebuff[Type] = true;
             Main.buffNoTimeDisplay[Type] = true;
             Main.debuff[Type] = true;
         }
@@ -23,18 +23,14 @@ namespace cool_jojo_stands.Buffs
         {
             StandoPlayer StandPlayer = player.GetModPlayer<StandoPlayer>();
 
-            if (StandPlayer.Stand != StandType.HermitPurple)
+            if (!StandPlayer.HaveHarmitPurpleStand)
             {
-                StandPlayer.Stand = StandType.HermitPurple;
+                StandPlayer.HaveHarmitPurpleStand = true;
                 StandPlayer.HaveStand = true;
                 StandPlayer.StandBuffName = "HermitPurple";
             }
 
-            player.buffTime[buffIndex] = 32767;
-        }
-        public override void ModifyBuffTip(ref string tip, ref int rare)
-        {
-            rare = ItemRarityID.Expert;
+            player.buffTime[buffIndex] = 2390;
         }
     }
 }

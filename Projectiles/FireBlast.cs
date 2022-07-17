@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -18,15 +19,15 @@ namespace cool_jojo_stands.Projectiles
 
         public override void SetDefaults()
         {
-            projectile.width = 16;
-            projectile.height = 16;
-            projectile.alpha = 0;
-            projectile.timeLeft = 600;
-            projectile.penetrate = 1;
-            projectile.hostile = true;
-            projectile.ranged = true;
-            projectile.tileCollide = true;
-            projectile.ignoreWater = false;
+            Projectile.width = 16;
+            Projectile.height = 16;
+            Projectile.alpha = 0;
+            Projectile.timeLeft = 600;
+            Projectile.penetrate = 1;
+            Projectile.hostile = true;
+            Projectile.DamageType = DamageClass.Ranged;
+            Projectile.tileCollide = true;
+            Projectile.ignoreWater = false;
         }
 
         public override bool? CanCutTiles() => true;
@@ -36,19 +37,19 @@ namespace cool_jojo_stands.Projectiles
         /* Fire blast AI function */
         public override void AI()
         {
-            if (projectile.localAI[0] == 0f)
+            if (Projectile.localAI[0] == 0f)
             {
-                Main.PlaySound(SoundID.Item20, projectile.position);
-                projectile.localAI[0] = 1f;
+                SoundEngine.PlaySound(SoundID.Item20, Projectile.position);
+                Projectile.localAI[0] = 1f;
             }
 
-            if (projectile.ai[0] != 1)
+            if (Projectile.ai[0] != 1)
             {
                 CreateDust();
-                projectile.ai[0] = 1;
+                Projectile.ai[0] = 1;
             }
             else
-                projectile.ai[0] = 0;
+                Projectile.ai[0] = 0;
         }
 
         /* Fire blast dust function */
@@ -57,22 +58,22 @@ namespace cool_jojo_stands.Projectiles
             int i, j;
             float x, y;
 
-            for (i = 0; i < projectile.Size.Y; i += 4)
-                for (j = 0; j < projectile.Size.X; j += 4)
+            for (i = 0; i < Projectile.Size.Y; i += 4)
+                for (j = 0; j < Projectile.Size.X; j += 4)
                 {
-                    x = j - projectile.Size.X / 2;
-                    y = i - projectile.Size.Y / 2;
+                    x = j - Projectile.Size.X / 2;
+                    y = i - Projectile.Size.Y / 2;
 
                     if (x * x + y * y > 16)
                         continue;
 
-                    int dust = Dust.NewDust(projectile.position + new Vector2(j, i), 
+                    int dust = Dust.NewDust(Projectile.position + new Vector2(j, i), 
                         6, 6,
-                        DustID.Fire,
-                        projectile.velocity.X, projectile.velocity.Y,
+                        DustID.Torch,
+                        Projectile.velocity.X, Projectile.velocity.Y,
                         0, default(Color), 2.75f);
 
-                    Main.dust[dust].position += projectile.velocity;
+                    Main.dust[dust].position += Projectile.velocity;
                     Main.dust[dust].noGravity = true;
                 }
         }
@@ -80,9 +81,9 @@ namespace cool_jojo_stands.Projectiles
         /* NPC hit function */
         public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
-            projectile.penetrate--;
+            Projectile.penetrate--;
 
-            Player player = Main.player[projectile.owner];
+            Player player = Main.player[Projectile.owner];
             StandoPlayer pl = player.GetModPlayer<StandoPlayer>();
 
             damage *= 2 * pl.StandLevel;

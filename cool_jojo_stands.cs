@@ -15,34 +15,20 @@ using cool_jojo_stands.SpecialAbilities;
 using cool_jojo_stands.Utils;
 using System.IO;
 using System;
-using cool_jojo_stands.Projectiles.Minions;
-using cool_jojo_stands.Projectiles;
-using cool_jojo_stands.Buffs;
+using ReLogic.Content;
 
 namespace cool_jojo_stands
 {
     class cool_jojo_stands : Mod
     {
-        public static ModHotKey StandSummonHT, StandAttack, SpecialAbilityHT, SwitchStandControlHT; // Hotkeys
-        public static Dictionary<StandType, ModProjectile> Stands;
-        public static Dictionary<StandType, ModBuff> StandBuffs;
-        public static Dictionary<StandType, StandAbilityDelegate> StandAbilities;
+        public static ModKeybind StandSummonHT, SpecialAbilityHT, SwitchStandControlHT; // Hotkeys
         public static Mod mod; // This mod class
-        public static float summonVolume; // Stand summon sound volume
-        public static float standBulletVolume; // Stand bullets summon volume
-        public static bool[] AttackingPlayers;
-        public static bool[] ManualingPlayers;
-        public static Vector2[] StandsPositions;
-
-        /* Interface variables */
-        private UserInterface StandInterface;
-        private StandUI StandoUI;
-        private GameTime StandUILastUpdate;
-
-        internal static StandConfig StandClientConfig; // Config
 
         public static bool usingSteam = false; // Is terraria starter via steam flag
         public static ulong SteamId = 0; // Steam profile id
+
+        public static bool leveledModLoaded = false;
+        public static Mod leveledMod = null;
 
         /* Mod constructor */
         public cool_jojo_stands()
@@ -86,86 +72,27 @@ namespace cool_jojo_stands
             }
 
             /* Register hotkeys */
-            StandSummonHT = RegisterHotKey("Summon Stand", "Insert");
-            SpecialAbilityHT = RegisterHotKey("Special ability", "P");
-            SwitchStandControlHT = RegisterHotKey("Switch stand control mode", "Home");
-            StandAttack = RegisterHotKey("Attack by Stand", "Mouse1");
-            
-            AttackingPlayers = new bool[256];
-            ManualingPlayers = new bool[256];
-            StandsPositions = new Vector2[256];
-
-            Stands = new Dictionary<StandType, ModProjectile>()
-            {
-                { StandType.HierophantGreen, new HierophantGreen() },
-                { StandType.SilverChariot, new SilverChariot() },
-                { StandType.HermitPurple, new HermitPurple() },
-                { StandType.StarPlatinum, new StarPlatinum() },
-                { StandType.MagicianRed, new MagicianRed() },
-                { StandType.TheWorld, new Projectiles.Minions.TheWorld() }
-            };
-            StandBuffs = new Dictionary<StandType, ModBuff>()
-            {
-                { StandType.HierophantGreen, new HierophantGreenStand() },
-                { StandType.SilverChariot, new SilverChariotStand() },
-                { StandType.HermitPurple, new HermitPurpleStand() },
-                { StandType.StarPlatinum, new StarPlatinumStand() },
-                { StandType.MagicianRed, new MagicianRedStand() },
-                { StandType.TheWorld, new Buffs.TheWorldStand() }
-            };
-
-            StandAbilityDelegate zaWardoAbility = (Player player, int standLevel) =>
-            {
-                if (standLevel < 20) return;
-
-                if (Main.netMode == NetmodeID.MultiplayerClient)
-                {
-                    ModPacket packet = GetPacket();
-
-                    packet.Write((byte)StandMessageType.TimeStopActivate);
-                    packet.Write(player.whoAmI);
-
-                    packet.Send();
-                }
-
-                Utils.SpecialAbilityManager.Abilities["ZaWardo"].GetAbilty<ZaWardoAbility>().Init(player.whoAmI);
-                Utils.SpecialAbilityManager.Activate("ZaWardo");
-            };
-            StandAbilityDelegate silverChariotGhostAbility = (Player player, int standLevel) =>
-            {
-                Utils.SpecialAbilityManager.Abilities["SCA"].GetAbilty<SilverChariotAbility>().Init(player.whoAmI);
-                Utils.SpecialAbilityManager.Activate("SCA");
-            };
-
-            StandAbilities = new Dictionary<StandType, StandAbilityDelegate>()
-            {
-                { StandType.TheWorld, zaWardoAbility },
-                { StandType.StarPlatinum, zaWardoAbility },
-                { StandType.SilverChariot, silverChariotGhostAbility }
-            };
+            StandSummonHT = KeybindLoader.RegisterKeybind(this, "Summon Stand", "Insert");
+            SpecialAbilityHT = KeybindLoader.RegisterKeybind(this, "Special ability", "P");
+            SwitchStandControlHT = KeybindLoader.RegisterKeybind(this, "Switch stand control mode", "Home");
 
             /* Loading special abilities */
             SpecialAbilityManager.Load();
-            SpecialAbilityManager.AddAbility("ZaWardo", new ZaWardoAbility());
+            SpecialAbilityManager.AddAbility("ZaWardo", new ZaWardo());
             SpecialAbilityManager.AddAbility("SCA", new SilverChariotAbility());
+
+            leveledModLoaded = ModLoader.TryGetMod("Leveled", out leveledMod);
 
             /* Client only loading */
             if (!Main.dedServ)
             {
-                /* Interface loading */
-                StandInterface = new UserInterface();
-                StandoUI = new StandUI();
-
-                StandoUI.Activate();
-
-                StandInterface.SetState(StandoUI);
-
                 /* Cut scene */
                 CutSceneManager.Load();
                 CutSceneManager.AddScene("Test", new CutScenes.TestCSc());
 
                 /* Red dolphin shader */
-                GameShaders.Misc["RedDolphin"] = new MiscShaderData(new Ref<Effect>(GetEffect("Effects/RedDolphin")), "RedDolphine");
+                GameShaders.Misc["RedDolphin"] = new MiscShaderData(
+                    new Ref<Effect>(Assets.Request<Effect>("Effects/RedDolphin", AssetRequestMode.ImmediateLoad).Value), "RedDolphine");
 
                 /* Bonus manager (not needed) */
                 /*try
@@ -214,51 +141,11 @@ namespace cool_jojo_stands
             RecipeGroup.RegisterGroup("CoolJoJoStands:DemoniteOrCrimtane", group);
         }
 
-        /* I don't know how it working, but it needs to UI go brrrrr... */
-        public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
-        {
-            int mouseTextIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
-
-            if (mouseTextIndex != -1)
-            {
-                layers.Insert(mouseTextIndex, new LegacyGameInterfaceLayer(
-                    "cool_jojo_stands:StandInterface",
-                    delegate
-                    {
-                        if (StandUILastUpdate != null && StandInterface.CurrentState != null)
-                        {
-                            StandInterface.Draw(Main.spriteBatch, StandUILastUpdate);
-                        }
-                        return true;
-                    },
-                    InterfaceScaleType.UI));
-            }
-        }
-
-        /* Update function */
-        private void Update()
-        {
-            summonVolume = StandClientConfig.StandSummonSoundVolume / 100f;
-            standBulletVolume = StandClientConfig.StandBulletSoundVolume / 100f;
-        }
-
-        /* Update UI function */
-        public override void UpdateUI(GameTime gameTime)
-        {
-            StandUILastUpdate = gameTime;
-
-            if (StandInterface.CurrentState != null)
-                StandInterface.Update(gameTime);
-        }
-
         /* Mod unloading function */
         public override void Unload()
         {
             if (!Main.dedServ)
             {
-                StandInterface = null;
-                StandoUI = null;
-
                 //BonusManager.UnLoad();
                 CutSceneManager.UnLoad();
             }
@@ -266,25 +153,14 @@ namespace cool_jojo_stands
             mod = null;
             StandSummonHT = null;
             SpecialAbilityHT = null;
-            StandClientConfig = null;
             SwitchStandControlHT = null;
-            StandAttack = null;
 
             SpecialAbilityManager.UnLoad();
         }
 
-        /* Cutscene zoom */
-        public override void ModifyTransformMatrix(ref SpriteViewMatrix Transform)
-        {
-            if (!Main.gameMenu && Utils.CutSceneManager.playing)
-            {
-                Transform.Zoom = Utils.CutSceneManager.GetZoom();
-            }
-        }
-
         internal enum StandMessageType : byte
         {
-            SyncNPCFromStatue, TimeStopActivate, StandManual, StandAttack, StandPosition
+            SyncNPCFromStatue, TimeStopActivate
         }
 
         public override void HandlePacket(BinaryReader reader, int whoAmI)
@@ -334,107 +210,10 @@ namespace cool_jojo_stands
                         packet.Send(-1, fromWho);
                     }
 
-                    SpecialAbilityManager.Abilities["ZaWardo"].GetAbilty<ZaWardoAbility>().Init(fromWho);
+                    SpecialAbilityManager.Abilities["ZaWardo"].GetAbilty<ZaWardo>().Init(fromWho);
                     SpecialAbilityManager.Activate("ZaWardo");
                     break;
-
-                case StandMessageType.StandManual:
-                    int fromWho2 = reader.ReadInt32();
-                    bool manualing = reader.ReadBoolean();
-                    ManualingPlayers[fromWho2] = manualing;
-
-                    if (Main.netMode == NetmodeID.Server)
-                    {
-                        ModPacket packet = mod.GetPacket();
-
-                        packet.Write((byte)StandMessageType.StandManual);
-                        packet.Write(fromWho2);
-                        packet.Write(manualing);
-
-                        packet.Send(-1, fromWho2);
-                    }
-                    break;
-
-                case StandMessageType.StandAttack:
-                    int fromWho3 = reader.ReadInt32();
-                    bool attacking = reader.ReadBoolean();
-                    AttackingPlayers[fromWho3] = attacking;
-
-                    if (Main.netMode == NetmodeID.Server)
-                    {
-                        ModPacket packet = mod.GetPacket();
-
-                        packet.Write((byte)StandMessageType.StandAttack);
-                        packet.Write(fromWho3);
-                        packet.Write(attacking);
-
-                        packet.Send(-1, fromWho3);
-                    }
-                    break;
-
-                case StandMessageType.StandPosition:
-                    int fromWho4 = reader.ReadInt32();
-                    float x = reader.ReadSingle();
-                    float y = reader.ReadSingle();
-                    StandsPositions[fromWho4] = new Vector2(x, y);
-
-                    if (Main.netMode == NetmodeID.Server)
-                    {
-                        ModPacket packet = mod.GetPacket();
-
-                        packet.Write((byte)StandMessageType.StandPosition);
-                        packet.Write(fromWho4);
-                        packet.Write(x);
-                        packet.Write(y);
-
-                        packet.Send(-1, fromWho4);
-                    }
-                    break;
             }
-        }
-
-        /* Mid update Player -> NPC */
-        public override void MidUpdatePlayerNPC()
-        {
-            /* sync npcs from statues to xp manger */
-            if (Main.netMode == NetmodeID.Server)
-            {
-                List<int> sfs = new List<int>();
-
-                for (int i = 0; i < 200; i++)
-                    if (Main.npc[i].SpawnedFromStatue && Main.npc[i].active)
-                        sfs.Add(i);
-
-                if (sfs.Count != 0)
-                {
-                    ModPacket packet = mod.GetPacket();
-
-                    packet.Write((byte)StandMessageType.SyncNPCFromStatue);
-                    packet.Write(sfs.Count);
-
-                    foreach (int i in sfs)
-                        packet.Write(i);
-
-                    packet.Send();
-                }
-            }
-        }
-
-        /* Pre update */
-        public override void PreUpdateEntities()
-        {
-            Utils.SpecialAbilityManager.PreUpdate();
-        }
-
-        /* Post update */
-        public override void PostUpdateEverything()
-        {
-            if (!Main.dedServ)
-                Utils.CutSceneManager.Update();
-
-            Utils.SpecialAbilityManager.Update();
-            Utils.SpecialAbilityManager.PostUpdate();
-            Update();
         }
     } /* End of 'cool_jojo_stands' class */
 }

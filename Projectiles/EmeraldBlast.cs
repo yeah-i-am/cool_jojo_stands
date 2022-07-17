@@ -18,16 +18,16 @@ namespace cool_jojo_stands.Projectiles
 
         public override void SetDefaults()
         {
-            projectile.width = 8;
-            projectile.height = 6;
-            projectile.alpha = 0;
-            projectile.timeLeft = 600;
-            projectile.penetrate = 1;
-            projectile.hostile = true;
-            projectile.ranged = true;
-            projectile.tileCollide = true;
-            projectile.ignoreWater = true;
-            projectile.netUpdate = true;
+            Projectile.width = 8;
+            Projectile.height = 6;
+            Projectile.alpha = 0;
+            Projectile.timeLeft = 600;
+            Projectile.penetrate = 1;
+            Projectile.hostile = true;
+            Projectile.DamageType = DamageClass.Ranged;
+            Projectile.tileCollide = true;
+            Projectile.ignoreWater = true;
+            Projectile.netUpdate = true;
         }
 
         public override bool? CanCutTiles() => true;
@@ -37,40 +37,40 @@ namespace cool_jojo_stands.Projectiles
         /* Emerald blast AI function */
         public override void AI()
         {
-            if (projectile.localAI[0] == 0f)
+            if (Projectile.localAI[0] == 0f)
             {
                 //Main.PlaySound(SoundID.Item20, projectile.position);
-                projectile.localAI[0] = 1f;
+                Projectile.localAI[0] = 1f;
             }
 
-            if (projectile.ai[0] != 1)
+            if (Projectile.ai[0] != 1)
             {
                 CreateDust();
-                projectile.ai[0] = 1;
+                Projectile.ai[0] = 1;
             }
             else
-                projectile.ai[0] = 0;
+                Projectile.ai[0] = 0;
         }
 
         /* Emerald blast dust function */
         public void CreateDust()
         {
-            int dust = Dust.NewDust(projectile.position,
+            int dust = Dust.NewDust(Projectile.position,
                 6, 6,
-                75,
-                projectile.velocity.X, projectile.velocity.Y,
+                DustID.CursedTorch,
+                Projectile.velocity.X, Projectile.velocity.Y,
                 0, default(Color), 2.75f);
 
-            Main.dust[dust].position += projectile.velocity;
+            Main.dust[dust].position += Projectile.velocity;
             Main.dust[dust].noGravity = true;
         }
 
         /* NPC hit function */
         public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
-            projectile.penetrate--;
+            Projectile.penetrate--;
 
-            Player player = Main.player[projectile.owner];
+            Player player = Main.player[Projectile.owner];
             StandoPlayer pl = player.GetModPlayer<StandoPlayer>();
 
             damage *= 3 * (pl.StandLevel - 1) + 1;

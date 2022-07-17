@@ -1,4 +1,5 @@
 ﻿using Terraria;
+using Terraria.Audio;
 using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.GameContent.UI.Elements;
@@ -89,12 +90,12 @@ namespace cool_jojo_stands.SpecialAbilities
             GoreRot = new float[500];
             GoreTimeLeft = new int[500];
 
-            WindSpeed = Main.windSpeed;
+            WindSpeed = Main.windSpeedCurrent;
         }
 
         public override void ShaderLoad()
         {
-                Ref<Effect> screenRef = new Ref<Effect>(cool_jojo_stands.mod.GetEffect("Effects/ZaWardo"));
+                Ref<Effect> screenRef = new Ref<Effect>(ModContent.Request<Effect>("cool_jojo_stands/Effects/ZaWardo", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value);
 
                 Filters.Scene["ZaWardo"] = new Filter(new ScreenShaderData(screenRef, "ZaWardo"), EffectPriority.VeryHigh);
                 Filters.Scene["ZaWardo"].Load();
@@ -181,22 +182,21 @@ namespace cool_jojo_stands.SpecialAbilities
             if (!Main.dedServ)
             {
                 if (!Filters.Scene["ZaWardo"].IsActive())
-                    Filters.Scene.Activate("ZaWardo", pl.player.Center);
+                    Filters.Scene.Activate("ZaWardo", pl.Player.Center);
 
-                Filters.Scene["ZaWardo"].GetShader().UseTargetPosition(pl.player.Center)
+                Filters.Scene["ZaWardo"].GetShader().UseTargetPosition(pl.Player.Center)
                         .UseOpacity(1.3f)               // Speed
                         .UseColor(AbilityTime, 1, 0.0f) // Stop time, back to normal time, End of 1/2 za wardo skip time
                         .UseSecondaryColor(1, 0, 239);  // End of 1/2 za wardo, negative offset
 
-                Main.PlaySound(
-                           cool_jojo_stands.mod.GetLegacySoundSlot(SoundType.Custom, "Sounds/Custom/SPZaWardoSound").WithVolume(cool_jojo_stands.summonVolume),
+                SoundEngine.PlaySound(new SoundStyle("cool_jojo_stands/Sounds/Custom/SPZaWardoSound") with { Volume = StandModSystem.summonVolume },
                            Main.player[whoAmI].Center);
             }
         }
 
         public override void End()
         {
-            Main.windSpeed = WindSpeed;
+            Main.windSpeedCurrent = WindSpeed;
 
             StandoPlayer pl = Main.player[whoAmI].GetModPlayer<StandoPlayer>();
 
@@ -205,7 +205,7 @@ namespace cool_jojo_stands.SpecialAbilities
 
         public override void PreUpdate()
         {
-            Main.windSpeed = 0;
+            Main.windSpeedCurrent = 0;
 
             for (int k = 0; k < 200; k++)
             {
@@ -269,7 +269,7 @@ namespace cool_jojo_stands.SpecialAbilities
             {
                 Projectile p = Main.projectile[k];
 
-                if (p.owner == whoAmI && p.melee == true)
+                if (p.owner == whoAmI && p.CountsAsClass(DamageClass.Melee) == true)
                     continue;
 
                 if (!p.active || !ProjActive[k])

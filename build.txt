@@ -1,9 +1,10 @@
-author = G@yLord239 & Vxlhat and Jen`Ok
-version = 0.3.3.1
-displayName = JoJoStands
+author = G@yLord239 and Jen`Ok
+version = 0.3.5.0
+displayName = [c/AF00AF:JoJo Stands] (by G@yLord239)
 hideCode = true
 hideResources = true
 includeSource = false
+#weakReferences = Leveled
 
 homepage = https://discord.gg/uDW2X7r
 

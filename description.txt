@@ -4,13 +4,14 @@ To summon the stand check the control settings.
 
 This is a fan mod by JoJo Bizzare Adventure.
 
-At the moment, the mod adds 5 stands:
-Star Platinum, Hermit Purple, The World, Magician's Red and Hierophant Green
-And also on some sets of armor, improving the characteristics of stand.
+At the moment, the mod adds 3 stands:
+Star Platinum, Magician's Red and Hierophant Green
+And also on 1 set of armor, improving the characteristics of stand.
 In the future, we plan to add new stands, new abilities and new clothes.
 
 The arrow for the stand is issued at the beginning of the game.
-For questions and suggestions, please contact our public in VK.
+
+This project is currently closed.
 
 ru:
 
@@ -18,10 +19,10 @@ ru:
 
 Это фанатский мод по JoJo Bizzare Adventure.
 
-На данный момент мод добавляет 5 стандов:
-Star Platinum, Hermit Purple, The World, Magician's Red и Hierophant Green
-А также по некоторые комплекты брони, улучшающие характеристики стандов.
+На данный момент мод добавляет 3 стандов:
+Star Platinum, Magician's Red и Hierophant Green
+А также по 1 комплекту брони, улучшающие характеристики стандов.
 В будущем, мы планируем добавлять новых стандов, новые способности и новую одежду.
 
 Стрела для получения станда выдаётся в начале игры.
-По вопросам и предложениям обращайтесь в наш паблик в ВК.
+По вопросам и предложениям обращайтесь на наш дискорд сервер.
